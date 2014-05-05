@@ -11,7 +11,9 @@ for domainpath in $domainpaths;
 do
 	newest=$(./single.sh $domainpath)
 
-	echo "$newest"
+	if [[ -e "$newest" ]]; then
+		echo "$newest"
+	fi
 done
 
 cd - > /dev/null

@@ -5,4 +5,6 @@ domainpath="${1%/}"
 
 newest=$(find $domainpath -type f | sort | tail -1)
 
-echo "$newest"
+if [[ -e "$newest" ]]; then
+	echo "$newest"
+fi
