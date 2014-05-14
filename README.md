@@ -1,6 +1,6 @@
-# [dulcify](https://github.com/joelpurra/dulcify/)
+# [har-dulcify](https://github.com/joelpurra/har-dulcify/)
 
-Extract data from [HAR files](http://www.softwareishard.com/blog/har-12-spec/), quite possibly downloaded by [heedless](https://github.com/joelpurra/heedless/), for some aggregate analysis.
+Extract data from [HTTP Archive (HAR) files](http://www.softwareishard.com/blog/har-12-spec/), quite possibly downloaded by [har-heedless](https://github.com/joelpurra/har-heedless/), for some aggregate analysis.
 
 
 
