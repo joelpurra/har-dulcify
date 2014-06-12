@@ -2,14 +2,6 @@
 set -e
 
 read -d '' getParts <<-'EOF' || true
-def splitUrlToParts:
-	split("://") as $protocolParts
-		| {
-			url: .,
-			protocol: $protocolParts[0],
-			domain: ($protocolParts[1] | split("/")[0])
-		};
-
 def header(name):
 	name as $name
 	| map(select(.name == $name) | .value) | .[0];
@@ -34,16 +26,27 @@ def deleteNullKeys:
 		)
 	);
 
-(.log.pages[0].id | splitUrlToParts | .domain) as $domain
-| {
-	url: .log.pages[0].id,
-	requestedUrls: .log.entries
-		| map({
-			url: .request.url,
-			"mime-type": .response.content.mimeType,
-			referer: .request.headers | header("Referer")
-		})
-	| map(deleteNullKeys)
+def getEntryDetails:
+	{
+		url: .request.url,
+		status: .response.status,
+		"mime-type": .response.content.mimeType,
+		referer: .request.headers | header("Referer"),
+		redirect: (
+			if (.response.redirectURL | length) == 0 then
+				null
+			else
+				.response.redirectURL
+			end
+		)
+	};
+
+{
+	origin: .log.entries[0] | getEntryDetails | deleteNullKeys,
+	requestedUrls: (
+		.log.entries[1:]
+		| map(getEntryDetails | deleteNullKeys)
+	)
 }
 EOF
 
