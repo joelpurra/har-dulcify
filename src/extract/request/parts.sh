@@ -2,7 +2,7 @@
 set -e
 
 read -d '' getParts <<-'EOF' || true
-def header(name):
+def httpHeader(name):
 	name as $name
 	| map(select(.name == $name) | .value) | .[0];
 
@@ -31,7 +31,7 @@ def getEntryDetails:
 		url: .request.url,
 		status: .response.status,
 		"mime-type": .response.content.mimeType,
-		referer: .request.headers | header("Referer"),
+		referer: .request.headers | httpHeader("Referer"),
 		redirect: (
 			if (.response.redirectURL | length) == 0 then
 				null
