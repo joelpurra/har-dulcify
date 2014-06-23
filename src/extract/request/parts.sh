@@ -6,19 +6,6 @@ def httpHeader(name):
 	name as $name
 	| map(select(.name == $name) | .value) | .[0];
 
-def deleteNullKey(key):
-	key as $key
-	| with_entries(
-		select(
-			.key != $key
-			or (
-				.key == $key
-				and
-				(.value | type) != "null"
-			)
-		)
-	);
-
 def deleteNullKeys:
 	with_entries(
 		select(
