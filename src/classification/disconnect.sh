@@ -4,6 +4,47 @@ set -e
 disconnectClassificationFile="$1"
 
 read -d '' classifyExpandedParts <<-'EOF' || true
+def map_keep_nonnull(mapper):
+	map(mapper
+		| select(
+			(. | type) != "null"
+		)
+	);
+
+def deleteEmtpyArray:
+	if (. | length) != 0 then . else empty end;
+
+def map_keep_noempty_nonulls_array(mapper):
+	map_keep_nonnull(mapper)
+	| deleteEmtpyArray;
+
+def map_keep_noempty_array(mapper):
+	map(mapper)
+	| deleteEmtpyArray;
+
+def with_entries_keep_nonnull(mapper):
+	to_entries
+	| map(mapper)
+	| map(
+		select(
+			(.value | type) != "null"
+		)
+	)
+	| from_entries;
+
+def deleteNullKey(key):
+	key as $key
+	| with_entries(
+		select(
+			.key != $key
+			or (
+				.key == $key
+				and
+				(.value | type) != "null"
+			)
+		)
+	);
+
 def deleteNullKeys:
 	with_entries(
 		select(
@@ -27,11 +68,11 @@ def isSameOrSubdomain(domain):
 def matchDisconnect:
 	. as $domain
 	| $disconnect.categories
-	| with_entries(
-		.value |= map(
-			with_entries(
-				.value |= with_entries(
-					.value |= map(
+	| with_entries_keep_nonnull(
+		.value |= map_keep_noempty_nonulls_array(
+			with_entries_keep_nonnull(
+				.value |= with_entries_keep_nonnull(
+					.value |= map_keep_noempty_array(
 						select(
 							. as $inDisconnect
 							| ($domain | isSameOrSubdomain($inDisconnect))
@@ -39,38 +80,6 @@ def matchDisconnect:
 					)
 				)
 			)
-		)
-	)
-	| with_entries(
-		.value |= map(
-			with_entries(
-				.value |= with_entries(
-					select(
-						(.value | length) > 0
-					)
-				)
-			)
-		)
-	)
-	| with_entries(
-		.value |= map(
-			with_entries(
-				select(
-					(.value | length) > 0
-				)
-			)
-		)
-	)
-	| with_entries(
-		.value |= map(
-			select(
-				(. | length) > 0
-			)
-		)
-	)
-	| with_entries(
-		select(
-			(.value | length) > 0
 		)
 	);
 
@@ -83,7 +92,7 @@ def mangle(origin):
 				}
 				| deleteNullKeys)
 	}
-	| deleteNullKeys;
+	| deleteNullKey("blocks");
 
 .origin.url as $origin
 | {
