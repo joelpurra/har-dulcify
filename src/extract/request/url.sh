@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/usr/bin/env bash
 set -e
 
 read -d '' getRequestUrls <<-'EOF' || true
