@@ -37,7 +37,4 @@ def getEntryDetails:
 }
 EOF
 
-while read harpath;
-do
-	cat "$harpath" | jq "$getParts"
-done
+cat | jq "$getParts"
