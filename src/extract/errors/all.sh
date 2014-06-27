@@ -14,7 +14,4 @@ select(
 )
 EOF
 
-while read harpath;
-do
-	cat "$harpath" | jq "$allWithComments" || (echo "ERROR: $harpath" >/dev/stderr)
-done
+cat | jq "$allWithComments"
