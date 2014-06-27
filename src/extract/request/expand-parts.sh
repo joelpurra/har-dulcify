@@ -2,6 +2,24 @@
 set -e
 
 read -d '' expandParts <<-'EOF' || true
+def splitDomainToPartsArray:
+	split(".") as $domainParts
+	# Negative range to build the domain from parts from the right.
+	| [ range((($domainParts | length) * -1); 0) ]
+	| map(
+		# Assemble the domain, longest domain combination first.
+		$domainParts[.:] | join(".")
+	);
+
+def splitDomainToParts:
+	. as $domain
+	| splitDomainToPartsArray as $domainParts
+	| {
+		original: $domain,
+		parts: $domainParts,
+		tld: $domainParts[-1:][0]
+	};
+
 def splitUrlToParts:
 	split("://") as $protocolParts
 	| if ($protocolParts | length) == 1 then
@@ -12,17 +30,9 @@ def splitUrlToParts:
 		{
 			original: .,
 			protocol: $protocolParts[0],
-			domain: ($protocolParts[1] | split("/")[0])
+			domain: ($protocolParts[1] | split("/")[0] | splitDomainToParts)
 		}
 	end;
-
-def classifyUrl(origin):
-	origin as $origin
-	| {
-		isSameDomain: (.domain == $origin.domain),
-		isSubdomain: ((.domain // "") | endswith("." + $origin.domain)),
-		isSecure: (.protocol == "https")
-	};
 
 def trim(str):
 	str as $str
@@ -52,9 +62,8 @@ def splitMime:
 	}
 	| deleteNullKeys;
 
-def mangle(origin):
-	origin as $origin
-	| (.url | splitUrlToParts) as $urlParts
+def mangle:
+	(.url | splitUrlToParts) as $urlParts
 	| {
 		url: $urlParts,
 		status: .status,
@@ -64,10 +73,9 @@ def mangle(origin):
 	}
 	| deleteNullKeys;
 
-(.origin.url | splitUrlToParts) as $origin
-| {
-	origin: .origin | mangle($origin),
-	requestedUrls: .requestedUrls | map(mangle(($origin)))
+{
+	origin: .origin | mangle,
+	requestedUrls: .requestedUrls | map(mangle)
 }
 EOF
 

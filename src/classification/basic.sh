@@ -16,22 +16,22 @@ def isSecure:
 def classifyUrl(origin):
 	origin as $origin
 	| {
-		isSameDomain: (.domain | isSameDomain($origin.domain)),
-		isSubdomain: (.domain | isSubdomain($origin.domain)),
+		# TODO: work on .domain.parts, not .domain.original?
+		isSameDomain: (.domain.original | isSameDomain($origin.domain.original)),
+		isSubdomain: (.domain.original | isSubdomain($origin.domain.original)),
 		isSecure: (.protocol | isSecure)
 	};
 
 def mangle(origin):
 	origin as $origin
-	| .url as $urlParts
 	| . + {
-		classification : $urlParts | classifyUrl($origin)
+		classification : .url | classifyUrl($origin)
 	};
 
 .origin.url as $origin
 | {
 	origin: .origin | mangle($origin),
-	requestedUrls: .requestedUrls | map(mangle(($origin)))
+	requestedUrls: .requestedUrls | map(mangle($origin))
 }
 EOF
 

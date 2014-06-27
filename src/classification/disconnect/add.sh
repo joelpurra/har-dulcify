@@ -35,13 +35,8 @@ def deleteEmptyArrayKey(key):
 def matchDisconnect:
 	# Match the domain to disconnect's list.
 	# If the domain is a subdomain of a domain in disconnect's list, include it too.
-	. as $domain
-	| ($domain | split(".")) as $domainParts
-	# Negative range to build the domain from parts from the right.
-	| [ range((($domainParts | length) * -1); -1) ]
-	| map(
-		# Assemble the domain, longest domain combination first.
-		($domainParts[.:] | join(".")) as $subdomain
+	map(
+		. as $subdomain
 		| if $disconnect | has($subdomain) then
 			(
 				# Inject the matched service domain into the returned object.
@@ -59,7 +54,7 @@ def matchDisconnect:
 
 def mangle:
 	.blocks += ({
-			disconnect: .url.domain | matchDisconnect
+			disconnect: .url.domain.parts | matchDisconnect
 		}
 		| deleteEmptyArrayKey("disconnect"))
 	| deleteNullKey("blocks");
