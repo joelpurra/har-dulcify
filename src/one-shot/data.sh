@@ -22,3 +22,6 @@ domainroot=$(cd "$domainroot"; echo "$PWD")
 
 # Add disconnect's block matching
 <"domains.parts.expanded.classified.json" "${BASH_SOURCE%/*}/../classification/disconnect/add.sh" "prepared.disconnect.services.json" > "domains.parts.expanded.classified.disconnect.json"
+
+# Add effective tld domain grouping
+<"domains.parts.expanded.classified.disconnect.json" "${BASH_SOURCE%/*}/../classification/effective-tld/add.sh" "prepared.effective-tld.json" > "domains.parts.expanded.classified.disconnect.effective-tld.json"
