@@ -29,10 +29,8 @@ def mangle(origin):
 	};
 
 .origin.url as $origin
-| {
-	origin: .origin | mangle($origin),
-	requestedUrls: .requestedUrls | map(mangle($origin))
-}
+| .origin |= mangle($origin)
+| .requestedUrls[] |= mangle($origin)
 EOF
 
 cat | jq "$classifyExpandedParts"

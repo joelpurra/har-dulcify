@@ -36,6 +36,7 @@ def matchDisconnect:
 	# Match the domain to disconnect's list.
 	# If the domain is a subdomain of a domain in disconnect's list, include it too.
 	map(
+		# has($subdomain) is more effective than $disconnect[$subdomain]
 		. as $subdomain
 		| if $disconnect | has($subdomain) then
 			(
@@ -54,15 +55,13 @@ def matchDisconnect:
 
 def mangle:
 	.blocks += ({
-			disconnect: .url.domain.parts | matchDisconnect
+			disconnect: (.url.domain.parts | matchDisconnect)
 		}
 		| deleteEmptyArrayKey("disconnect"))
 	| deleteNullKey("blocks");
 
-{
-	origin: .origin | mangle,
-	requestedUrls: .requestedUrls | map(mangle)
-}
+.origin |= mangle
+| .requestedUrls[] |= mangle
 EOF
 
 cat | jq "$classifyExpandedParts" --argfile "disconnect" "$disconnectClassificationFile"
