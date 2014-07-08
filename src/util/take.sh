@@ -8,11 +8,15 @@ then
 elif [[ $# == 1 ]]; then
 	takeNumStart=""
 	takeNumEnd="$1"
-	if [[ $takeNumEnd -le 0 ]]; then
+	if [[ $takeNumEnd == 0 ]]; then
 		exit 0
 	fi
+	if [[ $takeNumEnd -le 0 ]]; then
+		takeNumStart="$1"
+		takeNumEnd=""
+	fi
 else
-	echo "Return elements from a JSON array read from stdin. Count is natural. Start and end zero-based indices. Start is inclusive, end is not."
+	echo "Return elements from a JSON array read from stdin. Count is natural. Start and end zero-based indices. Start is inclusive, end is not. Negative numbers means taking from the end of the array."
 	echo "Usage: "
 	echo "    ${BASH_SOURCE##*/} [count]"
 	echo "    ${BASH_SOURCE##*/} [start] [end]"
