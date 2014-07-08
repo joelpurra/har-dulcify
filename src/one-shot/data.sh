@@ -25,9 +25,3 @@ domainroot=$(cd "$domainroot"; echo "$PWD")
 
 # Add effective tld domain grouping
 <"domains.parts.expanded.classified.disconnect.json" "${BASH_SOURCE%/*}/../classification/effective-tld/add.sh" "prepared.effective-tld.json" > "domains.parts.expanded.classified.disconnect.effective-tld.json"
-
-# Prepare aggregates base
-<"domains.parts.expanded.classified.disconnect.effective-tld.json" "${BASH_SOURCE%/*}/../aggregate/prepare.sh" > "aggregates.base.json"
-
-# Aggregates
-<"aggregates.base.json" "${BASH_SOURCE%/*}/../aggregate/all.sh" > "aggregates.json"
