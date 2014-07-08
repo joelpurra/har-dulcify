@@ -116,7 +116,10 @@ def base:
 			isSubdomain: 0,
 			isSecure: 0
 		},
-		"mime-type": {},
+		"mime-type": {
+			types: {},
+			groups: {}
+		},
 		status: {},
 		url: baseUrl,
 		referer: baseUrl,
@@ -166,11 +169,16 @@ def mangleOrigin(request):
 	request as $request
 	| .count += $request.count;
 
+def mangleMimeType(mimeType):
+	mimeType as $mimeType
+	| .types |= mergeKeyCounterObjects($mimeType.types)
+	| .groups |= mergeKeyCounterObjects($mimeType.groups);
+
 def mangle(request):
 	request as $request
 	| if $request.count > 0 then
 		mangleClassification($request)
-		| ."mime-type" |= mergeKeyCounterObjects($request."mime-type")
+		| ."mime-type" |= mangleMimeType($request."mime-type")
 		| .status |= mergeKeyCounterObjects($request.status)
 		| .url |= mangleUrl($request.url)
 		| .referer |= (if $request.referer then mangleUrl($request.referer) else . end)

@@ -55,12 +55,36 @@ def mimeParameter(name):
 		)
 	| .[0];
 
+def mimeTypeGrouping:
+	{
+		"application/javascript": "script",
+		"application/x-javascript": "script",
+		"text/javascript": "script",
+
+		"application/font-woff": "font",
+		"font/ttf": "font",
+
+		"application/json": "data",
+		"application/octet-stream": "data",
+
+		"image/gif": "image",
+		"image/jpeg": "image",
+		"image/png": "image",
+		"image/svg+xml": "image",
+
+		"text/css": "style",
+		"text/html": "html",
+		"text/plain": "text",
+	} as $typeLookup
+	| $typeLookup[.];
+
 def splitMime:
-	split(";") as $mimeParts
+	(split(";") | map(trim(" "))) as $mimeParts
 	| {
 		original: .,
-		type: $mimeParts[0] | trim(" "),
-		charset: $mimeParts[1:] | mimeParameter("charset")
+		type: $mimeParts[0],
+		charset: $mimeParts[1:] | mimeParameter("charset"),
+		group: ($mimeParts[0] | mimeTypeGrouping)
 	}
 	| deleteNullKeys;
 

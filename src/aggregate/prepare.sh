@@ -26,10 +26,16 @@ def mangleUrl:
 		)
 	};
 
+def mangleMimeType:
+	{
+		type: ."mime-type".type,
+		group: ."mime-type".group
+	};
+
 def mangle:
 	{
 		classification,
-		"mime-type": (."mime-type".type),
+		"mime-type": mangleMimeType,
 		status,
 		url: (.url | mangleUrl),
 		referer: (if .referer then (.referer | mangleUrl) else null end),

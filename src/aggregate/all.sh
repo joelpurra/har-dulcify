@@ -97,7 +97,10 @@ def base:
 			isSubdomain: 0,
 			isSecure: 0
 		},
-		"mime-type": {},
+		"mime-type": {
+			types: {},
+			groups: {}
+		},
 		status: {},
 		url: baseUrl,
 		referer: baseUrl,
@@ -143,10 +146,15 @@ def mangleBlocks(request):
 	request as $request
 	| .blocks.disconnect |= mangleDisconnect($request.blocks.disconnect);
 
+def mangleMimeType(mimeType):
+	mimeType as $mimeType
+	| .types |= addToKeyCounterObject($mimeType.type | fallbackString)
+	| .groups |= addToKeyCounterObject($mimeType.group | fallbackString);
+
 def mangle(request):
 	request as $request
 	| mangleClassification($request)
-	| ."mime-type" |= addToKeyCounterObject($request."mime-type" | fallbackString)
+	| ."mime-type" |= mangleMimeType($request."mime-type")
 	| .status |= addToKeyCounterObject($request.status | toStringOrFallbackString)
 	| .url |= mangleUrl($request.url | fallbackString)
 	| .referer |= (if $request.referer then mangleUrl($request.referer) else . end)

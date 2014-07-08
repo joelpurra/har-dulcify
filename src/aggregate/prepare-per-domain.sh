@@ -115,6 +115,12 @@ def mangleBlocks(request):
 	request as $request
 	| .blocks.disconnect |= mangleDisconnect($request.blocks.disconnect);
 
+def mangleMimeType(mimeType):
+	mimeType as $mimeType
+	| .types |= setKeyCounterObjectCount($mimeType.type | fallbackString; 1)
+	| .groups |= setKeyCounterObjectCount($mimeType.group | fallbackString; 1);
+
+
 .origin = {
 	count: 1
 }
@@ -126,6 +132,10 @@ def mangleBlocks(request):
 				isSameDomain: (.[0].classification.isSameDomain // false),
 				isSubdomain: (.[0].classification.isSubdomain // false),
 				isSecure: (.[0].classification.isSecure // false)
+			},
+			"mime-type": {
+				types: {},
+				groups: {}
 			},
 			# TODO: remove empty objects after filters?
 			blocks: {
@@ -141,7 +151,7 @@ def mangleBlocks(request):
 		.classification.isSameDomain = (.classification.isSameDomain and $request.classification.isSameDomain)
 		| .classification.isSubdomain = (.classification.isSubdomain and $request.classification.isSubdomain)
 		| .classification.isSecure = (.classification.isSecure and $request.classification.isSecure)
-		| ."mime-type" |= setKeyCounterObjectCount($request."mime-type" | fallbackString; 1)
+		| ."mime-type" |= mangleMimeType($request."mime-type")
 		| .status |= setKeyCounterObjectCount($request.status | toStringOrFallbackString; 1)
 		| .url |= mangleUrl($request.url)
 		| .referer |= (if $request.referer then mangleUrl($request.referer) else . end)
