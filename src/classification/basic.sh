@@ -20,7 +20,14 @@ def classifyUrl(origin):
 		isSameDomain: (.domain.original | isSameDomain($origin.domain.original)),
 		isSubdomain: (.domain.original | isSubdomain($origin.domain.original)),
 		isSecure: (.protocol | isSecure)
+		# TODO: add isInternal, isExternal since they might be inaccurate to infer later.
 	};
+
+# TODO: classify an entire HAR as succesful or not.
+# TODO: classify HTTP response status.
+# def statusIsSuccesful:
+# 	((. >= 200 and . < 300) or (. == 301 or . == 302));
+# "is-successful": statusIsSuccesful
 
 def mangle(origin):
 	origin as $origin

@@ -88,11 +88,32 @@ def splitMime:
 	}
 	| deleteNullKeys;
 
+def statusGroup:
+	if . >= 100 and . < 200 then
+		"1xx"
+	elif . >= 200 and . < 300 then
+		"2xx"
+	elif . >= 300 and . < 400 then
+		"3xx"
+	elif . >= 400 and . < 500 then
+		"4xx"
+	elif . >= 500 and . < 600 then
+		"5xx"
+	else
+		null
+	end;
+
+def expandStatus:
+	{
+		code: .,
+		group: statusGroup
+	};
+
 def mangle:
 	(.url | splitUrlToParts) as $urlParts
 	| {
 		url: $urlParts,
-		status: .status,
+		status: (.status | expandStatus),
 		"mime-type": (if ."mime-type" then (."mime-type" | splitMime) else null end),
 		referer: (if .referer then (.referer | splitUrlToParts) else null end),
 		redirect: (if .redirect then (.redirect | splitUrlToParts) else null end)
