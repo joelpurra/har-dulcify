@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -e
+
+read -d '' analysis <<-'EOF' || true
+def keyCounterObjectSortByKeyAsc:
+	to_entries
+	| sort_by(.key)
+	| from_entries;
+
+def addToKeyCounterObject(obj):
+	obj as $obj
+	| .[$obj] = ((.[$obj] // 0) + 1);
+
+def addArrayToKeyCounterObject(arr):
+	. as $keyCounterObject
+	| arr as $arr
+	| reduce $arr[] as $item
+	(
+		$keyCounterObject;
+		addToKeyCounterObject($item)
+	);
+
+def flatten:
+	reduce
+		.[] as $item
+		(
+			[];
+			if ($item | type) == "array" then
+				. + $item
+			else
+				. + [ $item ]
+			end
+		);
+
+def breakOutArrays:
+	{
+		# Flattening necessary since some entries have multiple categories/organizations/urls.
+		categories: (map(.categories) | flatten),
+		organizations: (map(.organizations) | flatten),
+		urls: (map(.urls) | flatten),
+		# Flattening just in case.
+		domains: to_entries | (map(.key) | flatten),
+		entries: length
+	};
+
+def getOrganizationsByDomainCount:
+	map(.)
+	| group_by(.organizations)
+	| map(
+		length as $count
+		| .[0]
+		| {
+			organizations,
+			urls,
+			count: $count
+		}
+	);
+
+def getOrganizationsWithTheMostDomains:
+	getOrganizationsByDomainCount
+	| sort_by(.count)
+	| reverse
+	| .[0:10];
+
+def groupOrganizationsByDomainCount:
+	getOrganizationsByDomainCount
+	| group_by(.count);
+
+def getOrganizationCountByDomainCount:
+	getOrganizationsByDomainCount
+	| group_by(.count)
+	| map(
+		{
+			domains: .[0].count,
+			organizations: length
+		}
+	);
+
+. as $root
+| breakOutArrays
+| {
+	entries,
+	distinct: {
+		domains: (.domains | unique | length),
+		organizations: (.organizations | unique | length),
+		urls: (.urls | unique | length),
+		categories: (.categories | unique | length)
+	},
+	"domains-per-category": (
+		.categories as $categories
+		| {}
+		| addArrayToKeyCounterObject($categories)
+		| keyCounterObjectSortByKeyAsc
+	)
+}
+| . + {
+	"domains-per-organization": {
+		"average": (.distinct.domains / .distinct.organizations),
+		"top-ten": ($root | getOrganizationsWithTheMostDomains),
+		"group-by-count": ($root | getOrganizationCountByDomainCount)
+	}
+}
+EOF
+
+cat | jq "$analysis"
