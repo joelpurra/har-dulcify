@@ -2,6 +2,10 @@
 set -e
 
 read -d '' getStructure <<-'EOF' || true
+def replace(a; b):
+	split(a)
+	| join(b);
+
 def safeLookupValue:
 	if type != "string" then
 		tostring
@@ -32,20 +36,26 @@ def isWhitelisted(whitelist):
 	)
 	| all;
 
+def digitsLookup:
+	"0123456789" | explode | arrayToLookup;
+
+def lettersLookup:
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | explode | arrayToLookup;
+
+def specialAlphanumericLookup:
+	"_" | explode | arrayToLookup;
+
+def alphanumericLookup:
+	digitsLookup + lettersLookup + specialAlphanumericLookup;
+
 def isNumeric:
-	("0123456789" | explode | arrayToLookup) as $digits
-	| isWhitelisted($digits);
+	isWhitelisted(digitsLookup);
 
 def isAlpha:
-	("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | explode | arrayToLookup) as $letters
-	| isWhitelisted($letters);
+	isWhitelisted(lettersLookup);
 
 def isAlphanumeric:
-	("0123456789" | explode | arrayToLookup) as $digits
-	| ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | explode | arrayToLookup) as $letters
-	| ("_" | explode | arrayToLookup) as $special
-	| ($digits + $letters + $special) as $alphanumeric
-	| isWhitelisted($alphanumeric);
+	isWhitelisted(alphanumericLookup);
 
 def isValidJsonShorthandPropertyName:
 	(.[0:1] | isAlpha | not) or (isAlphanumeric | not);
@@ -65,8 +75,7 @@ def isValidJsonShorthandPropertyName:
 		end
 	)
 	| join(".")
-	| split("." + "[")
-	| join("[")
+	| replace(".["; "[")
 ]
 | unique
 | map("." + .)
