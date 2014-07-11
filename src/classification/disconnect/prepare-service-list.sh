@@ -1,4 +1,4 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 read -d '' classifyExpandedParts <<-'EOF' || true

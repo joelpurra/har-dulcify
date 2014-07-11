@@ -1,4 +1,4 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 read -d '' getParts <<-'EOF' || true

@@ -1,4 +1,4 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 "${BASH_SOURCE%/*}/preparations.sh"

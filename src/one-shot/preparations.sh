@@ -1,4 +1,4 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 # services.json (also known as disconnect-plaintext.json) from disconnect.me
