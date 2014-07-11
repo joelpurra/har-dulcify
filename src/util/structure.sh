@@ -6,15 +6,8 @@ def replace(a; b):
 	split(a)
 	| join(b);
 
-def safeLookupValue:
-	if type != "string" then
-		tostring
-	else
-		.
-	end;
-
 def arrayToLookup:
-	map(safeLookupValue)
+	map(@text)
 	| reduce .[] as $exists (
 		{};
 		. + {
@@ -23,7 +16,7 @@ def arrayToLookup:
 	);
 
 def lookup(value):
-	(value | safeLookupValue) as $value
+	(value | @text) as $value
 	| has($value);
 
 def isWhitelisted(whitelist):
