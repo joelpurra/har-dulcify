@@ -7,6 +7,12 @@ def keyCounterObjectSortByKeyAsc:
 	| sort_by(.key)
 	| from_entries;
 
+def keyCounterObjectSortByValueDesc:
+	to_entries
+	| sort_by(.value)
+	| reverse
+	| from_entries;
+
 def addToKeyCounterObject(obj):
 	obj as $obj
 	| .[$obj] = ((.[$obj] // 0) + 1);
@@ -31,6 +37,25 @@ def flatten:
 				. + [ $item ]
 			end
 		);
+
+def mergeArrayOfObjectsToObject:
+	# Assumes that the array's objects have unique enough properties to be suitable for merging.
+	reduce .[] as $obj ({}; . + $obj);
+
+def keyCounterObjectMinimum(n):
+	n as $n
+	| with_entries(
+		select(.value >= $n)
+	);
+
+def keyCounterObjectMinimumTwo:
+	keyCounterObjectMinimum(2);
+
+def augmentWithCount:
+	{
+		count: length,
+		values: .
+	};
 
 def breakOutArrays:
 	{
@@ -60,7 +85,7 @@ def getOrganizationsWithTheMostDomains:
 	getOrganizationsByDomainCount
 	| sort_by(.count)
 	| reverse
-	| .[0:10];
+	| .[0:25];
 
 def groupOrganizationsByDomainCount:
 	getOrganizationsByDomainCount
@@ -75,6 +100,66 @@ def getOrganizationCountByDomainCount:
 			organizations: length
 		}
 	);
+
+def getOrganizationsByCategoryCount:
+	map(.)
+	| reduce .[] as $item
+	(
+		[];
+		. + (
+			if ($item.categories | type) == "array" then
+				[
+					$item.categories[]
+					| . as $category
+					| $item
+					| .categories = $category
+				]
+			else
+				[ $item ]
+			end
+		)
+	)
+	| group_by(.categories)
+	| map(
+		group_by(.organizations)
+		| map(
+			length as $count
+			| .[0]
+			| {
+				categories,
+				organizations,
+				count: $count
+			}
+		)
+	);
+
+def getOrganizationsWithTheMostCategories:
+	getOrganizationsByCategoryCount
+	| map(
+		map(
+			.organizations
+		)
+		| flatten
+	) 
+	| reduce .[] as $categoryWithOrganizations
+	(
+		{};
+		addArrayToKeyCounterObject($categoryWithOrganizations)
+	)
+	| keyCounterObjectMinimumTwo
+	| keyCounterObjectSortByValueDesc
+	| augmentWithCount;
+
+def getOrganizationCountByCategoryCount:
+	getOrganizationsByCategoryCount
+	| map(
+		length as $count
+		| .[0]
+		| {
+			(.categories): $count
+		}
+	)
+	| mergeArrayOfObjectsToObject;
 
 . as $root
 | breakOutArrays
@@ -96,8 +181,14 @@ def getOrganizationCountByDomainCount:
 | . + {
 	"domains-per-organization": {
 		"average": (.distinct.domains / .distinct.organizations),
-		"top-ten": ($root | getOrganizationsWithTheMostDomains),
+		"top-twentyfive": ($root | getOrganizationsWithTheMostDomains),
 		"group-by-count": ($root | getOrganizationCountByDomainCount)
+	}
+}
+| . + {
+	"organizations-per-category": {
+		"more-than-one": ($root | getOrganizationsWithTheMostCategories),
+		"count": ($root | getOrganizationCountByCategoryCount)
 	}
 }
 EOF
