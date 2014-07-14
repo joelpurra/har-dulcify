@@ -19,20 +19,15 @@ def keyCounterObjectTop(n):
 	| .[0:$n]
 	| from_entries;
 
+def keyCounterObjectTopTen:
+	keyCounterObjectTop(10);
+
+def keyCounterObjectTopOneHundred:
+	keyCounterObjectTop(100);
+
 def keyCounterObjectSortByKeyAsc:
 	to_entries
 	| sort_by(.key)
-	| from_entries;
-
-def keyCounterObjectSortByKeyDesc:
-	to_entries
-	| sort_by(.key)
-	| reverse
-	| from_entries;
-
-def keyCounterObjectSortByValueAsc:
-	to_entries
-	| sort_by(.value)
 	| from_entries;
 
 def keyCounterObjectSortByValueDesc:
@@ -40,15 +35,6 @@ def keyCounterObjectSortByValueDesc:
 	| sort_by(.value)
 	| reverse
 	| from_entries;
-
-def keyCounterObjectTopTen:
-	keyCounterObjectTop(10);
-
-def keyCounterObjectTopOneHundred:
-	keyCounterObjectTop(100);
-
-def operateOnKeys(f):
-	with_entries(.key |= f);
 
 def operateOnValues(f):
 	with_entries(.value |= f);

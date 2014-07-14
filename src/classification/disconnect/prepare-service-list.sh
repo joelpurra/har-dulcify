@@ -14,6 +14,10 @@ def toNullOrSingleValueOrArray:
 		.
 	end;
 
+def mergeArrayOfObjectsToObject:
+	# Assumes that the array's objects have unique enough properties to be suitable for merging.
+	reduce .[] as $obj ({}; . + $obj);
+
 def flattenDisconnect:
 	# services.json keeps service domains in the deepest level.
 	# This flattens the hierarchy to one object per domain, but duplicates other information.
@@ -54,10 +58,6 @@ def groupDomains:
 			}
 		}
 	);
-
-def mergeArrayOfObjectsToObject:
-	# Assumes that the array's objects have unique enough properties to be suitable for merging.
-	reduce .[] as $obj ({}; . + $obj);
 
 def transformRawDisconnect:
 	flattenDisconnect
