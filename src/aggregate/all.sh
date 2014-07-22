@@ -133,7 +133,10 @@ def mergeArrayToCounterArray(arr):
 
 def baseUrl:
 	{
-		domain: {}
+		domain: {
+			original: {},
+			groups: {}
+		}
 	};
 
 def base:
@@ -260,8 +263,8 @@ def distinctBase:
 
 def distinctMangleDomain(domain):
 	domain as $domain
-	| .original |= mergeKeyCounterObjects($domain.original)
-	| .groups |= mergeKeyCounterObjects($domain.groups);
+	| .original |= mergeKeyCounterObjects($domain.original // {})
+	| .groups |= mergeKeyCounterObjects($domain.groups // {});
 
 def distinctMangleUrl(url):
 	. as $aggregatedUrl

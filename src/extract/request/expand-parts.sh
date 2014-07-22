@@ -80,12 +80,18 @@ def mimeTypeGrouping:
 
 def splitMime:
 	(split(";") | map(trim(" "))) as $mimeParts
-	| {
-		original: .,
-		type: $mimeParts[0],
-		charset: $mimeParts[1:] | mimeParameter("charset"),
-		group: ($mimeParts[0] | mimeTypeGrouping)
-	}
+	| if (($mimeParts | length) | (. == 1 or . == 2)) then
+		{
+			original: .
+		}
+	else
+		{
+			original: .,
+			type: $mimeParts[0],
+			charset: $mimeParts[1:] | mimeParameter("charset"),
+			group: (if $mimeParts[0] then ($mimeParts[0] | mimeTypeGrouping) else null end)
+		}
+	end
 	| deleteNullKeys;
 
 def statusGroup:

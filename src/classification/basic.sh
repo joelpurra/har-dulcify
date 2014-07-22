@@ -17,8 +17,8 @@ def classifyUrl(origin):
 	origin as $origin
 	| {
 		# TODO: work on .domain.parts, not .domain.original?
-		isSameDomain: (.domain.original | isSameDomain($origin.domain.original)),
-		isSubdomain: (.domain.original | isSubdomain($origin.domain.original)),
+		isSameDomain: (if .domain.original then (.domain.original | isSameDomain($origin.domain.original)) else false end),
+		isSubdomain: (if .domain.original then (.domain.original | isSubdomain($origin.domain.original)) else false end),
 		isSecure: (.protocol | isSecure)
 		# TODO: add isInternal, isExternal since they might be inaccurate to infer later.
 	};

@@ -54,11 +54,15 @@ def matchDisconnect:
 	| unique;
 
 def mangle:
-	.blocks += ({
-			disconnect: (.url.domain.parts | matchDisconnect)
-		}
-		| deleteEmptyArrayKey("disconnect"))
-	| deleteNullKey("blocks");
+	if .url and .url.domain and .url.domain.parts then
+		.blocks += ({
+				disconnect: (.url.domain.parts | matchDisconnect)
+			}
+			| deleteEmptyArrayKey("disconnect"))
+		| deleteNullKey("blocks")
+	else
+		.
+	end;
 
 .origin |= mangle
 | .requestedUrls[] |= mangle
