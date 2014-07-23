@@ -30,19 +30,6 @@ def aggregate(key):
 		}
 	);
 
-def addToKeyCounterObject(obj):
-	obj as $obj
-	| .[$obj] = ((.[$obj] // 0) + 1);
-
-def addArrayToKeyCounterObject(arr):
-	. as $keyCounterObject
-	| arr as $arr
-	| reduce $arr[] as $item
-	(
-		$keyCounterObject;
-		addToKeyCounterObject($item)
-	);
-
 def fallbackString:
 	if . then
 		.
@@ -216,16 +203,6 @@ def mangle(request):
 	| .url |= mangleUrl($request.url | fallbackString)
 	| .referer |= (if $request.referer then mangleUrl($request.referer) else . end)
 	| mangleBlocks($request)
-	| .count += 1;
-
-def distinctMangle(request):
-	request as $request
-	# | mangleClassification($request)
-	# | ."mime-type" |= mangleMimeType($request."mime-type")
-	# | .status |= mangleStatus($request.status)
-	# | .url |= mangleUrl($request.url | fallbackString)
-	# | .referer |= (if $request.referer then mangleUrl($request.referer) else . end)
-	# | mangleBlocks($request)
 	| .count += 1;
 
 def distinctBaseUrl:
