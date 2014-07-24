@@ -194,7 +194,7 @@ def distinctMangle:
 		| deleteNullKey("referer")
 		| distinctMangleBlocks($request)
 		| .count += 1
-	) 
+	)
 	| .blocks.disconnect |= (
 		deleteEmptyObjectKey("domains")
 		| deleteEmptyObjectKey("organizations")
