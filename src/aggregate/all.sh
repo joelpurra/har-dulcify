@@ -39,7 +39,7 @@ cat | "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/prepare2
 
 getMergedObjectCount
 
-while [[ $mergedObjectCount > 2 ]]; do
+while (( $mergedObjectCount > 2 )); do
 	cat "$TEMPOUT1" | "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/merge.sh" > "$TEMPOUT2"
 	mv "$TEMPOUT2" "$TEMPOUT1"
 	getMergedObjectCount
