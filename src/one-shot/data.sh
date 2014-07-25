@@ -9,19 +9,22 @@ domainroot=$(cd -- "$domainroot"; echo "$PWD")
 "${BASH_SOURCE%/*}/../domains/latest/all.sh" "$domainroot" > "domains.latest.txt"
 
 # Concatenate all of them to a single file with a lot of HARs
+# Not sure if parallelizing concatenation actually helps, since disk access is limiting
+#<"domains.latest.txt" parallel --pipe --max-replace-args=10 --group "tr '\n' '\0' | \"${BASH_SOURCE%/*}/../util/cat-path.sh\"" > "domains.latest.har"
+# <"domains.latest.txt" parallel --max-args=10 --group cat > "domains.latest.har"
 <"domains.latest.txt" "${BASH_SOURCE%/*}/../util/cat-path.sh" > "domains.latest.har"
 
 # Extract the most interesting parts
-<"domains.latest.har" "${BASH_SOURCE%/*}/../extract/request/parts.sh" > "domains.parts.json"
+<"domains.latest.har" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../extract/request/parts.sh" > "domains.parts.json"
 
 # Expand parts by splitting them up to parts
-<"domains.parts.json" "${BASH_SOURCE%/*}/../extract/request/expand-parts.sh" > "domains.parts.expanded.json"
+<"domains.parts.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../extract/request/expand-parts.sh" > "domains.parts.expanded.json"
 
 # Add basic classifications
-<"domains.parts.expanded.json" "${BASH_SOURCE%/*}/../classification/basic.sh" > "domains.parts.expanded.classified.json"
+<"domains.parts.expanded.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/basic.sh" > "domains.parts.expanded.classified.json"
 
 # Add disconnect's block matching
-<"domains.parts.expanded.classified.json" "${BASH_SOURCE%/*}/../classification/disconnect/add.sh" "prepared.disconnect.services.json" > "domains.parts.expanded.classified.disconnect.json"
+<"domains.parts.expanded.classified.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/disconnect/add.sh" "prepared.disconnect.services.json" > "domains.parts.expanded.classified.disconnect.json"
 
 # Add effective tld domain grouping
-<"domains.parts.expanded.classified.disconnect.json" "${BASH_SOURCE%/*}/../classification/effective-tld/add.sh" "prepared.effective-tld.json" > "domains.parts.expanded.classified.disconnect.effective-tld.json"
+<"domains.parts.expanded.classified.disconnect.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/effective-tld/add.sh" "prepared.effective-tld.json" > "domains.parts.expanded.classified.disconnect.effective-tld.json"
