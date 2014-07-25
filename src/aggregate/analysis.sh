@@ -39,31 +39,52 @@ def keyCounterObjectSortByValueDesc:
 def operateOnValues(f):
 	with_entries(.value |= f);
 
-def unlessNull(f):
-	if . then
+def unlessNullFallback(f; fallback):
+	if type != "null" then
 		f
 	else
-		.
+		fallback
 	end;
+
+def unlessNull(f):
+	unlessNullFallback(f; .);
+
+def nullFallback(fallback):
+	if type != "null" then
+		.
+	else
+		fallback
+	end;	
+
+def nullFalllbackEmptyObject:
+	nullFallback({});
 
 def mangleUrl:
 	{
-		domains: .domain.original | keyCounterObjectTopOneHundred | (keyCounterObjectMinimumTwo // {}) | keyCounterObjectSortByValueDesc,
-		groups: .domain.groups | keyCounterObjectTopTen,
+		domains: .domain.original | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
+		groups: .domain.groups | keyCounterObjectTopTen | nullFalllbackEmptyObject,
 	};
 
 def mangleBlocks:
 	{
 		disconnect: (.blocks.disconnect | {
-					domains: .domains | keyCounterObjectTopOneHundred,
-					organizations: .organizations | keyCounterObjectTopOneHundred,
-					categories: .categories | keyCounterObjectTopOneHundred,
+					domains: .domains | keyCounterObjectTopOneHundred | nullFalllbackEmptyObject,
+					organizations: .organizations | keyCounterObjectTopOneHundred | nullFalllbackEmptyObject,
+					categories: .categories | keyCounterObjectTopOneHundred | nullFalllbackEmptyObject,
 				})
 	};
 
 def coverageKeyCounterObject(countDistinct):
 	countDistinct as $countDistinct
-	| unlessNull(operateOnValues(. / $countDistinct) | keyCounterObjectSortByValueDesc);
+	| unlessNullFallback(
+		operateOnValues(
+			. / $countDistinct)
+			| unlessNullFallback(
+				keyCounterObjectSortByValueDesc;
+				{}
+		);
+		{}
+	);
 
 def coverageUrl(countDistinct):
 	countDistinct as $countDistinct
