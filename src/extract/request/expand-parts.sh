@@ -80,7 +80,7 @@ def mimeTypeGrouping:
 
 def splitMime:
 	(split(";") | map(trim(" "))) as $mimeParts
-	| if (($mimeParts | length) | (. == 1 or . == 2)) then
+	| if (($mimeParts | length) | (. != 1 and . != 2)) then
 		{
 			original: .
 		}
