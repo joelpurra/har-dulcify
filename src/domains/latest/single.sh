@@ -3,9 +3,9 @@ set -e
 
 domainpath="${1%/}"
 domainpath="${domainpath:-$PWD}"
-domainpath=$(cd "$domainpath"; echo "$PWD")
+domainpath=$(cd -- "$domainpath"; echo "$PWD")
 
-newest=$(find "$domainpath" -type f -name '*.har' | sort | tail -1)
+newest=$(find "$domainpath" -type f -name '*.har' -print0 | sort -z | tail -1)
 
 if [[ -e "$newest" ]]; then
 	echo "$newest"

@@ -3,7 +3,7 @@ set -e
 
 domainroot="${1%/}"
 domainroot="${domainroot:-$PWD}"
-domainroot=$(cd "$domainroot"; echo "$PWD")
+domainroot=$(cd -- "$domainroot"; echo "$PWD")
 
 # Get a list of the most recently downloaded domains
 "${BASH_SOURCE%/*}/../domains/latest/all.sh" "$domainroot" > "domains.latest.txt"
