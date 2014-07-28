@@ -51,7 +51,7 @@ def mimeParameter(name):
 	name as $name
 	| map(
 		trim(" ") | split("=") as $parameterParts
-		| select($parameterParts[0] == $name) | $parameterParts[1] | trim("\\"")
+		| select(length == 2 and $parameterParts[0] == $name) | $parameterParts[1] | trim("\\"")
 		)
 	| .[0];
 
