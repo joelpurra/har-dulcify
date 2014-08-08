@@ -5,29 +5,28 @@ read -d '' selectSuccessfulPageLoad <<-'EOF' || true
 def isFailedPageLoad:
 	.log
 	| (
-		(
-			.entries
-			| (
-				type == "null"
-				or
-				length == 0
-			)
-		)
+		type != "object"
 		or
 		(
-			.entries[0]
-			| (
-				(
-					.response
-					| type == "null"
-				)
-				or
-				(
-					.response.status
-					| (
-						type == "null"
-						or
-						. <= 0
+			.entries
+			| type != "array"
+			or
+			length == 0
+			or
+			(
+				.entries[0].response
+				| (
+					type != "object"
+					or
+					(
+						.status
+						| (
+							type != "number"
+							or
+							. < 100
+							or
+							. > 999
+						)
 					)
 				)
 			)
