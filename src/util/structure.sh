@@ -50,7 +50,7 @@ def isAlpha:
 def isAlphanumeric:
 	isWhitelisted(alphanumericLookup);
 
-def isValidJsonShorthandPropertyName:
+def isNotValidJsonShorthandPropertyName:
 	(.[0:1] | isAlpha | not) or (isAlphanumeric | not);
 
 [
@@ -60,7 +60,7 @@ def isValidJsonShorthandPropertyName:
 			"[]"
 		else
 			tostring
-			| if isValidJsonShorthandPropertyName then
+			| if isNotValidJsonShorthandPropertyName then
 				"[\\"\\(.)\\"]"
 			else
 				.
