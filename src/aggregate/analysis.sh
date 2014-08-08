@@ -61,8 +61,8 @@ def nullFalllbackEmptyObject:
 
 def mangleUrl:
 	{
-		domains: .domain.original | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
-		groups: .domain.groups | keyCounterObjectTopTen | nullFalllbackEmptyObject,
+		domains: .domain.value | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
+		"public-suffices": .domain."public-suffices" | keyCounterObjectTopTen | nullFalllbackEmptyObject,
 	};
 
 def mangleBlocks:
@@ -89,7 +89,7 @@ def coverageKeyCounterObject(countDistinct):
 def coverageUrl(countDistinct):
 	countDistinct as $countDistinct
 	| .domains |= coverageKeyCounterObject($countDistinct)
-	| .groups |= coverageKeyCounterObject($countDistinct);
+	| ."public-suffices" |= coverageKeyCounterObject($countDistinct);
 
 def coverage:
 	.countDistinct as $countDistinct
@@ -118,10 +118,14 @@ def mangleShared(root):
 				groups: ."mime-type".groups | keyCounterObjectTopTen
 			},
 			classification: {
-				"is-internal": (.classification.isSameDomain + .classification.isSubdomain),
-				"is-external": (.countDistinct - .classification.isSameDomain - .classification.isSubdomain),
-				"is-secure": .classification.isSecure,
-				"is-insecure": (.countDistinct - .classification.isSecure),
+				"is-same-domain": .classification.isSameDomain,
+				"is-subdomain": .classification.isSubdomain,
+				"is-internal-domain": .classification.isInternalDomain,
+				"is-external-domain": .classification.isExternalDomain,
+				"is-successful-request": .classification.isSuccessful,
+				"is-unsuccessful-request": (.countDistinct - .classification.isSuccessful),
+				"is-secure-request": .classification.isSecure,
+				"is-insecure-request": (.countDistinct - .classification.isSecure),
 			},
 			urls: .url | mangleUrl,
 			blocks: mangleBlocks,

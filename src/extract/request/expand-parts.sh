@@ -2,41 +2,68 @@
 set -e
 
 read -d '' expandParts <<-'EOF' || true
-def splitDomainToPartsArray:
-	split(".") as $domainParts
-	# Negative range to build the domain from parts from the right.
-	| [ range((($domainParts | length) * -1); 0) ]
-	| map(
-		# Assemble the domain, longest domain combination first.
-		$domainParts[.:] | join(".")
-	);
-
-def splitDomainToParts:
-	. as $domain
-	| splitDomainToPartsArray as $domainParts
-	| {
-		original: $domain,
-		parts: $domainParts,
-		tld: $domainParts[-1:][0]
-	};
-
-def splitUrlToParts:
-	split("://") as $protocolParts
-	| if ($protocolParts | length) == 1 then
-		{
-			original: .
-		}
-	else
-		{
-			original: .,
-			protocol: $protocolParts[0],
-			domain: ($protocolParts[1] | split("/")[0] | splitDomainToParts)
-		}
-	end;
-
 def trim(str):
 	str as $str
 	| ltrimstr($str) | rtrimstr($str);
+
+def arrayToLookup:
+	map(@text)
+	| reduce .[] as $exists (
+		{};
+		. + {
+			($exists): null
+		}
+	);
+
+def lookup(value):
+	(value | @text) as $value
+	| has($value);
+
+def isWhitelisted(whitelist):
+	whitelist as $whitelist
+	| explode
+	| map(
+		. as $charCode
+		| $whitelist
+		| lookup($charCode)
+	)
+	| all;
+
+def digitsLookup:
+	"0123456789" | explode | arrayToLookup;
+
+def lettersLookup:
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | explode | arrayToLookup;
+
+def specialAlphanumericLookup:
+	"_" | explode | arrayToLookup;
+
+def alphanumericLookup:
+	digitsLookup + lettersLookup + specialAlphanumericLookup;
+
+def isNumeric:
+	isWhitelisted(digitsLookup);
+
+def isAlpha:
+	isWhitelisted(lettersLookup);
+
+def isAlphanumeric:
+	isWhitelisted(alphanumericLookup);
+
+def specialDomainCharacterLookup:
+	"-." | explode | arrayToLookup;
+
+def isSpecialDomainCharacter:
+	isWhitelisted(specialDomainCharacterLookup);
+
+def isFirstDomainCharacter:
+	isWhitelisted(digitsLookup + lettersLookup);
+
+def isSubsequentDomainCharacter:
+	isWhitelisted(digitsLookup + lettersLookup + specialDomainCharacterLookup);
+
+def isValidDomainNameComponentLookup:
+	(.[0:1] | isFirstDomainCharacter) and (.[1:] | isSubsequentDomainCharacter);
 
 def deleteNullKeys:
 	with_entries(
@@ -44,6 +71,322 @@ def deleteNullKeys:
 			(.value | type) != "null"
 		)
 	);
+
+def checkUrlValidity:
+	index(":") as $firstColon
+	| index("/") as $firstSlash
+	| index("?") as $firstQuestionMark
+	| index("#") as $firstHash
+	| (
+		($firstColon < $firstSlash)
+		and
+		((($firstSlash | type) == "null") or (($firstQuestionMark | type) == "null") or ($firstSlash < $firstQuestionMark))
+		and
+		((($firstQuestionMark | type) == "null") or (($firstHash | type) == "null") or ($firstQuestionMark < $firstHash))
+	);
+
+def splitDomainToComponentsArray:
+	split(".") as $domainComponents
+	# Negative range to build the domain from components from the right.
+	| [ range((($domainComponents | length) * -1); 0) ]
+	| map(
+		# Assemble the domain, longest domain combination first.
+		$domainComponents[.:] | join(".")
+	);
+
+def splitDomainToComponents:
+	. as $domain
+	| splitDomainToComponentsArray as $domainComponents
+	| {
+		value: $domain,
+		components: $domainComponents,
+		tld: $domainComponents[-1:][0],
+		valid: ($domainComponents | map(isValidDomainNameComponentLookup) | all)
+	};
+
+def getScheme:
+	split(":")
+	| if length >= 2 then
+		{
+			value: .[0],
+			rest: (.[1:] | join(":")),
+			valid: true
+		}
+	else
+		{
+			value: null,
+			rest: null,
+			valid: false
+		}
+	end;
+
+def isIgnoredScheme:
+	. as $scheme
+	| ["data", "about"] as $ignoredSchemes
+	| $ignoredSchemes
+	| map(. == $scheme)
+	| any;
+
+def removeLeadingSlashSlash:
+	if startswith("//") then
+		.[2:]
+	else
+		.
+	end;
+
+def getAuthority:
+	split("?")
+	| .[0]
+	| split("#")
+	| .[0]
+	| removeLeadingSlashSlash
+	| split("/")
+	| {
+		value: .[0],
+		valid: true
+	};
+
+def getPort:
+	split(":")
+	| if length == 1 then
+		{
+			value: null,
+			separator: false,
+			valid: true
+		}
+	elif length == 2 then
+		.[1]
+		| if isNumeric then
+			{
+				value: (. | tonumber),
+				separator: true,
+				valid: true
+			}
+		else
+			{
+				value: null,
+				separator: true,
+				valid: false
+			}
+		end
+	else
+		{
+			value: null,
+			separator: false,
+			valid: false
+		}
+	end;
+
+def getDomain:
+	split(":")
+	| .[0]
+	| splitDomainToComponents;
+
+def getAfterAuthority:
+	removeLeadingSlashSlash
+	| length as $length
+	| (
+		[
+			index("/"),
+			index("?"),
+			index("#"),
+			$length
+		]
+		| map(select((type != "null") and (. >= 0)))
+		| min
+		| [., 0]
+		| max
+	) as $firstAfter
+	| .[$firstAfter:$length];
+
+def getPathComponents:
+	split("/")
+	| (
+		if length > 0 then
+			.[1:]
+		else
+			[]
+		end
+	);
+
+def getPath:
+	split("?")
+	| (.[0] // "")
+	| split("#")
+	| (.[0] // "")
+	| {
+		value: .,
+		components: getPathComponents,
+		valid: true
+	};
+
+def getQuerystringComponent:
+	split("=")
+	| if length == 1 then
+		{
+			key: .[0],
+			value: null,
+			separator: false,
+			valid: true
+		}
+	elif length == 2 then
+		if (.[0] | length) > 0 then
+			{
+				key: .[0],
+				value: .[1],
+				separator: true,
+				valid: true
+			}
+		else
+			{
+				key: null,
+				value: .[1],
+				separator: true,
+				valid: false
+			}
+		end
+	else
+		{
+			key: null,
+			value: null,
+			separator: false,
+			valid: false
+		}
+	end;
+
+def getQuerystringComponents:
+	split("&")
+	| map(getQuerystringComponent);
+
+def getQuery:
+	. as $original
+	| split("?")
+	| if length <= 1 then
+		{
+			value: null,
+			separator: ($original == "?"),
+			valid: true
+		}
+	elif length == 2 then
+		.[1]
+		| split("#")
+		| .[0]
+		| if length == 0 then
+			{
+				value: null,
+				separator: true,
+				components: [],
+				valid: true
+			}
+		else
+			{
+				value: .,
+				separator: true,
+				components: getQuerystringComponents,
+				valid: true
+			}
+		end
+	else
+		{
+			value: null,
+			separator: false,
+			valid: false
+		}
+	end;
+
+def getFragment:
+	. as $original
+	| split("#")
+	| if length <= 1 then
+		{
+			value: null,
+			separator: ($original == "#"),
+			valid: true
+		}
+	elif length == 2 then
+		{
+			value: .[1],
+			separator: true,
+			valid: true
+		}
+	else
+		{
+			value: null,
+			separator: false,
+			valid: false
+		}
+	end;
+
+def isValidComponent:
+	. and .valid == true;
+
+def allComponentsValid:
+	map(isValidComponent)
+	| all;
+
+def deleteInvalidComponentKey(key):
+	key as $key
+	| with_entries(
+		select(
+			.key != $key
+			or (
+				.key == $key
+				and
+				(.value | isValidComponent)
+			)
+		)
+	);
+
+def splitUrlToComponents:
+	. as $value
+	| checkUrlValidity as $validity
+	| if ($validity | not) then
+		{
+			value: $value
+		}
+	else
+		($value | getScheme) as $scheme
+		| if ($scheme.valid | not) or ($scheme.value | isIgnoredScheme) then
+			{
+				value: $value,
+				scheme: $scheme
+			}
+		else
+			($scheme.rest | getAuthority) as $authoritySplit
+			| ($authoritySplit.value | getDomain) as $domain
+			| ($authoritySplit.value | getPort) as $port
+			| ($scheme.rest | getAfterAuthority) as $afterAuthority
+			| ($afterAuthority | getPath) as $path
+			| ($afterAuthority | getQuery) as $query
+			| ($afterAuthority | getFragment) as $fragment
+			| {
+				value: $value,
+				scheme: $scheme,
+				domain: $domain,
+				port: $port,
+				path: $path,
+				query: $query,
+				fragment: $fragment
+			}
+		end
+	end
+	| {
+		value: .value,
+		valid: ([.scheme, .domain, .port, .path, .query, .fragment] | allComponentsValid),
+		scheme: (.scheme | del(.rest)),
+		domain: .domain,
+		port: .port,
+		path: .path,
+		query: .query,
+		fragment: .fragment
+	}
+	| deleteInvalidComponentKey("scheme")
+	| deleteInvalidComponentKey("domain")
+	| deleteInvalidComponentKey("port")
+	| deleteInvalidComponentKey("path")
+	| deleteInvalidComponentKey("query")
+	| deleteInvalidComponentKey("fragment")
+	| deleteNullKeys;
 
 # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
 # http://www.w3.org/Protocols/rfc1341/4_Content-Type.html
@@ -116,13 +459,13 @@ def expandStatus:
 	};
 
 def mangle:
-	(.url | splitUrlToParts) as $urlParts
+	(.url | splitUrlToComponents) as $urlParts
 	| {
 		url: $urlParts,
 		status: (.status | expandStatus),
 		"mime-type": (if ."mime-type" then (."mime-type" | splitMime) else null end),
-		referer: (if .referer then (.referer | splitUrlToParts) else null end),
-		redirect: (if .redirect then (.redirect | splitUrlToParts) else null end)
+		referer: (if .referer then (.referer | splitUrlToComponents) else null end),
+		redirect: (if .redirect then (.redirect | splitUrlToComponents) else null end)
 	}
 	| deleteNullKeys;
 

@@ -94,8 +94,8 @@ def mangleUrl:
 	{
 		domain: (
 			.domain | {
-					original: .original,
-					groups: (if .groups then (.groups | map(.original)) else null end)
+					value: .value,
+					"public-suffices": (if ."public-suffices" then (."public-suffices" | map(.original)) else null end)
 			}
 		)
 	};
@@ -123,8 +123,8 @@ def mangle:
 
 def distinctMangleDomain(domain):
 	domain as $domain
-	| .original |= setKeyCounterObjectCount($domain.original | fallbackString; 1)
-	| .groups |= setArrayToKeyCounterObject(($domain.groups // []) | map(fallbackString); 1);
+	| .value |= setKeyCounterObjectCount($domain.value | fallbackString; 1)
+	| ."public-suffices" |= setArrayToKeyCounterObject(($domain."public-suffices" // []) | map(fallbackString); 1);
 
 def distinctMangleUrl(url):
 	. as $aggregatedUrl
@@ -163,6 +163,9 @@ def distinctMangle:
 			classification: {
 				isSameDomain: (.[0].classification.isSameDomain // false),
 				isSubdomain: (.[0].classification.isSubdomain // false),
+				isInternalDomain: (.[0].classification.isInternalDomain // false),
+				isExternalDomain: (.[0].classification.isExternalDomain // false),
+				isSuccessful: (.[0].classification.isSuccessful // false),
 				isSecure: (.[0].classification.isSecure // false)
 			},
 			"mime-type": {
@@ -186,6 +189,9 @@ def distinctMangle:
 		};
 		.classification.isSameDomain = (.classification.isSameDomain and $request.classification.isSameDomain)
 		| .classification.isSubdomain = (.classification.isSubdomain and $request.classification.isSubdomain)
+		| .classification.isInternalDomain = (.classification.isInternalDomain and $request.classification.isInternalDomain)
+		| .classification.isExternalDomain = (.classification.isExternalDomain and $request.classification.isExternalDomain)
+		| .classification.isSuccessful = (.classification.isSuccessful and $request.classification.isSuccessful)
 		| .classification.isSecure = (.classification.isSecure and $request.classification.isSecure)
 		| ."mime-type" |= distinctMangleMimeType($request."mime-type")
 		| .status |= distinctMangleStatus($request.status)

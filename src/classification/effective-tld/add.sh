@@ -33,7 +33,7 @@ def deleteEmptyArrayKey(key):
 	);
 
 def matchEffectiveTld:
-	# Match the domain to all possible rules/groups int the effective tld list.
+	# Match the domain to all possible rules/groups/public-suffices in the effective tld list.
 	map(
 		# has($subdomain) is more effective than $effectiveTld[.] // empty
 		. as $subdomain
@@ -45,7 +45,7 @@ def matchEffectiveTld:
 	);
 
 def mangle:
-	.domain.groups = (if .domain.parts then (.domain.parts | matchEffectiveTld) else null end);
+	.domain."public-suffices" = (if .domain.components then (.domain.components | matchEffectiveTld) else null end);
 
 .origin.url |= mangle
 | .requestedUrls[].url |= mangle

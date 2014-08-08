@@ -15,29 +15,55 @@ def isSecure:
 
 def classifyUrl(origin):
 	origin as $origin
+	# TODO: work on .domain.components, not .domain.value?
+	| (if (.domain.value and $origin.domain.value) then (.domain.value | isSameDomain($origin.domain.value)) else false end) as $isSameDomain
+	| (if (.domain.value and $origin.domain.value) then (.domain.value | isSubdomain($origin.domain.value)) else false end) as $isSubdomain
 	| {
-		# TODO: work on .domain.parts, not .domain.original?
-		isSameDomain: (if .domain.original then (.domain.original | isSameDomain($origin.domain.original)) else false end),
-		isSubdomain: (if .domain.original then (.domain.original | isSubdomain($origin.domain.original)) else false end),
-		isSecure: (.protocol | isSecure)
-		# TODO: add isInternal, isExternal since they might be inaccurate to infer later.
+		isSameDomain: $isSameDomain,
+		isSubdomain: $isSubdomain,
+		isInternalDomain: ($isSameDomain or $isSubdomain),
+		isExternalDomain: (($isSameDomain or $isSubdomain) | not),
+		isSecure: (if (.scheme and .scheme.valid and .scheme.value) then (.scheme.value | isSecure) else false end)
 	};
 
-# TODO: classify an entire HAR as succesful or not.
-# TODO: classify HTTP response status.
-# def statusIsSuccesful:
-# 	((. >= 200 and . < 300) or (. == 301 or . == 302));
-# "is-successful": statusIsSuccesful
+def statusIsSuccessful:
+	type == "object"
+	and
+	(
+		.code
+		| (
+			type == "number"
+			and
+			(
+				(. >= 200 and . < 300)
+				or
+				(. == 301 or . == 302)
+			)
+		)
+	);
+
+def classifyStatus:
+	{
+		isSuccessful: statusIsSuccessful
+	};
+
+def classify(origin):
+	origin as $origin
+	| {}
+	+
+	(.url | classifyUrl($origin))
+	+
+	(.status | classifyStatus);
 
 def mangle(origin):
 	origin as $origin
 	| . + {
-		classification : .url | classifyUrl($origin)
+		classification: classify($origin)
 	};
 
 .origin.url as $origin
 | .origin |= mangle($origin)
-| .requestedUrls[] |= mangle($origin)
+| .requestedUrls |= map(mangle($origin))
 EOF
 
 cat | jq "$classifyExpandedParts"

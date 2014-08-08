@@ -121,8 +121,8 @@ def mergeArrayToCounterArray(arr):
 def baseUrl:
 	{
 		domain: {
-			original: {},
-			groups: {}
+			value: {},
+			"public-suffices": {}
 		}
 	};
 
@@ -131,6 +131,9 @@ def base:
 		classification: {
 			isSameDomain: 0,
 			isSubdomain: 0,
+			isInternalDomain: 0,
+			isExternalDomain: 0,
+			isSuccessful: 0,
 			isSecure: 0
 		},
 		"mime-type": {
@@ -156,8 +159,8 @@ def base:
 
 def mangleDomain(domain):
 	domain as $domain
-	| .original |= addToKeyCounterObject($domain.original | fallbackString)
-	| .groups |= addArrayToKeyCounterObject(($domain.groups // []) | map(fallbackString));
+	| .value |= addToKeyCounterObject($domain.value | fallbackString)
+	| ."public-suffices" |= addArrayToKeyCounterObject(($domain."public-suffices" // []) | map(fallbackString));
 
 def mangleUrl(url):
 	. as $aggregatedUrl
@@ -168,6 +171,9 @@ def mangleClassification(request):
 	request as $request
 	| .classification.isSameDomain += ($request.classification.isSameDomain | boolToInt)
 	| .classification.isSubdomain += ($request.classification.isSubdomain | boolToInt)
+	| .classification.isInternalDomain += ($request.classification.isInternalDomain | boolToInt)
+	| .classification.isExternalDomain += ($request.classification.isExternalDomain | boolToInt)
+	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)
 	| .classification.isSecure += ($request.classification.isSecure | boolToInt);
 
 def mangleDisconnect(disconnect):
@@ -208,8 +214,8 @@ def mangle(request):
 def distinctBaseUrl:
 	{
 		domain: {
-			original: {},
-			groups: {}
+			value: {},
+			"public-suffices": {}
 		}
 	};
 
@@ -218,6 +224,9 @@ def distinctBase:
 		classification: {
 			isSameDomain: 0,
 			isSubdomain: 0,
+			isInternalDomain: 0,
+			isExternalDomain: 0,
+			isSuccessful: 0,
 			isSecure: 0
 		},
 		"mime-type": {
@@ -243,8 +252,8 @@ def distinctBase:
 
 def distinctMangleDomain(domain):
 	domain as $domain
-	| .original |= mergeKeyCounterObjects($domain.original // {})
-	| .groups |= mergeKeyCounterObjects($domain.groups // {});
+	| .value |= mergeKeyCounterObjects($domain.value // {})
+	| ."public-suffices" |= mergeKeyCounterObjects($domain."public-suffices" // {});
 
 def distinctMangleUrl(url):
 	. as $aggregatedUrl
@@ -255,6 +264,9 @@ def distinctMangleClassification(request):
 	request as $request
 	| .classification.isSameDomain += ($request.classification.isSameDomain | boolToInt)
 	| .classification.isSubdomain += ($request.classification.isSubdomain | boolToInt)
+	| .classification.isInternalDomain += ($request.classification.isInternalDomain | boolToInt)
+	| .classification.isExternalDomain += ($request.classification.isExternalDomain | boolToInt)
+	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)
 	| .classification.isSecure += ($request.classification.isSecure | boolToInt);
 
 def distinctMangleDisconnect(disconnect):

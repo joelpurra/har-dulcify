@@ -54,9 +54,9 @@ def matchDisconnect:
 	| unique;
 
 def mangle:
-	if .url and .url.domain and .url.domain.parts then
+	if .url and .url.domain and .url.domain.components then
 		.blocks += ({
-				disconnect: (.url.domain.parts | matchDisconnect)
+				disconnect: (.url.domain.components | matchDisconnect)
 			}
 			| deleteEmptyArrayKey("disconnect"))
 		| deleteNullKey("blocks")
