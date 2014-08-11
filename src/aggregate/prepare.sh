@@ -166,6 +166,8 @@ def distinctMangle:
 				isInternalDomain: (.[0].classification.isInternalDomain // false),
 				isExternalDomain: (.[0].classification.isExternalDomain // false),
 				isSuccessful: (.[0].classification.isSuccessful // false),
+				isUnsuccessful: (.[0].classification.isUnsuccessful // false),
+				isFailed: (.[0].classification.isFailed // false),
 				isSecure: (.[0].classification.isSecure // false)
 			},
 			"mime-type": {
@@ -192,6 +194,8 @@ def distinctMangle:
 		| .classification.isInternalDomain = (.classification.isInternalDomain and $request.classification.isInternalDomain)
 		| .classification.isExternalDomain = (.classification.isExternalDomain and $request.classification.isExternalDomain)
 		| .classification.isSuccessful = (.classification.isSuccessful and $request.classification.isSuccessful)
+		| .classification.isUnsuccessful = (.classification.isUnsuccessful and $request.classification.isUnsuccessful)
+		| .classification.isFailed = (.classification.isFailed and $request.classification.isFailed)
 		| .classification.isSecure = (.classification.isSecure and $request.classification.isSecure)
 		| ."mime-type" |= distinctMangleMimeType($request."mime-type")
 		| .status |= distinctMangleStatus($request.status)

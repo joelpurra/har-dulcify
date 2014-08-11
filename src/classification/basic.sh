@@ -37,14 +37,52 @@ def statusIsSuccessful:
 			(
 				(. >= 200 and . < 300)
 				or
-				(. == 301 or . == 302)
+				(. == 304)
+			)
+		)
+	);
+
+def statusIsUnsuccessful:
+	type == "object"
+	and
+	(
+		.code
+		| (
+			type == "number"
+			and
+			(
+				(. >= 100 and . < 200)
+				or
+				(. >= 300 and . < 304)
+				or
+				(. >= 305 and . < 600)
+			)
+		)
+	);
+
+def statusIsFailed:
+	type != "object"
+	or
+	(
+		.code
+		| (
+			type != "number"
+			or
+			(
+				(. < 100)
+				or
+				(. >= 600)
 			)
 		)
 	);
 
 def classifyStatus:
 	{
-		isSuccessful: statusIsSuccessful
+		isSuccessful: statusIsSuccessful,
+		isUnsuccessful: statusIsUnsuccessful,
+		# TODO: distinguish between software and network/external errors?
+		# Would require checking the HAR data for .log.creator.name == "heedless"?
+		isFailed: statusIsFailed
 	};
 
 def classify(origin):
