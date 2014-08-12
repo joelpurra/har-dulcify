@@ -114,8 +114,8 @@ def mangleShared(root):
 	| {
 		counts: {
 			"kinds-resource": {
-				types: ."mime-type".types | keyCounterObjectTopTen,
-				groups: ."mime-type".groups | keyCounterObjectTopTen
+				types: ."mime-type".types,
+				groups: ."mime-type".groups
 			},
 			classification: {
 				"is-same-domain": .classification.isSameDomain,
