@@ -98,6 +98,10 @@ def coverage:
 			types: ."kinds-resource".types | coverageKeyCounterObject($countDistinct),
 			groups: ."kinds-resource".groups | coverageKeyCounterObject($countDistinct)
 		},
+		"request-status": {
+			codes: ."request-status".codes | coverageKeyCounterObject($countDistinct),
+			groups: ."request-status".groups | coverageKeyCounterObject($countDistinct)
+		},
 		classification: .classification | coverageKeyCounterObject($countDistinct) | keyCounterObjectSortByKeyAsc,
 		urls: .urls | coverageUrl($countDistinct),
 		blocks: {
@@ -116,6 +120,10 @@ def mangleShared(root):
 			"kinds-resource": {
 				types: ."mime-type".types,
 				groups: ."mime-type".groups
+			},
+			"request-status": {
+				codes: .status.codes,
+				groups: .status.groups
 			},
 			classification: {
 				"is-same-domain": .classification.isSameDomain,
