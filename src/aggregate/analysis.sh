@@ -62,7 +62,7 @@ def nullFalllbackEmptyObject:
 def mangleUrl:
 	{
 		domains: .domain.value | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
-		"public-suffices": .domain."public-suffices" | keyCounterObjectTopTen | nullFalllbackEmptyObject,
+		"public-suffices": .domain."public-suffices" | nullFalllbackEmptyObject,
 	};
 
 def mangleBlocks:
