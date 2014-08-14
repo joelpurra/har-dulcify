@@ -405,10 +405,14 @@ def mimeTypeGrouping:
 		"text/javascript": "script",
 
 		"application/font-woff": "font",
+		"application/x-woff": "font",
+		"application/x-font-ttf": "font",
 		"font/ttf": "font",
+		"font/opentype": "font",
 
 		"application/json": "data",
 		"application/octet-stream": "data",
+		"application/xml": "data",
 
 		"image/gif": "image",
 		"image/jpeg": "image",
