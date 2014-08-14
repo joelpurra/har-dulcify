@@ -124,7 +124,7 @@ def mangle:
 def distinctMangleDomain(domain):
 	domain as $domain
 	| .value |= setKeyCounterObjectCount($domain.value | fallbackString; 1)
-	| ."public-suffices" |= setArrayToKeyCounterObject(($domain."public-suffices" // []) | map(fallbackString); 1);
+	| ."public-suffices" |= setArrayToKeyCounterObject(($domain."public-suffices" // []) | map(.idn | fallbackString); 1);
 
 def distinctMangleUrl(url):
 	. as $aggregatedUrl
@@ -213,9 +213,33 @@ def distinctMangle:
 	| .blocks |= deleteEmptyObjectKey("disconnect")
 	| deleteEmptyObjectKey("blocks");
 
-.origin |= mangle
-| .requestedUrls[] |= mangle
-| .requestedUrlsDistinct = (.requestedUrls | distinctMangle)
+def mangleUrlGroup:
+	if . then
+		{
+			requestedUrls: map(mangle),
+			requestedUrlsDistinct: distinctMangle
+		}
+	else
+		null
+	end;
+
+def mangleGroup:
+	if . then
+		{
+			origin: (.origin | mangle),
+			unfilteredUrls: (.requestedUrls | mangleUrlGroup),
+			internalUrls: (.requestedUrls | map(select(.classification.isInternalDomain)) | mangleUrlGroup),
+			externalUrls: (.requestedUrls | map(select(.classification.isExternalDomain)) | mangleUrlGroup),
+		}
+	else
+		null
+	end;
+
+mangleGroup as $mangledGroup
+| {
+	unfiltered: $mangledGroup,
+	successfulOrigin: (if .origin.classification.isFailed == false then $mangledGroup else null end),
+}
 EOF
 
 cat | jq "$getAggregateBase"

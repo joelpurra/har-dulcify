@@ -113,12 +113,39 @@ def mangle(halfway):
 	| .count += $halfway.count
 	| .countDistinct += $halfway.countDistinct;
 
+def mangleUrlGroup(halfwayUrls):
+	halfwayUrls as $halfwayUrls
+	| if . then
+		if $halfwayUrls then
+			.requestedUrls |= mangle($halfwayUrls.requestedUrls)
+			| .requestedUrlsDistinct |= mangle($halfwayUrls.requestedUrlsDistinct)
+		else
+			.
+		end
+	else
+		$halfwayUrls
+	end;
+
+def mangleGroup(halfway):
+	halfway as $halfway
+	| if . then
+		if $halfway then
+			.origin |= mangle($halfway.origin)
+			| .unfilteredUrls |= mangleUrlGroup($halfway.unfilteredUrls)
+			| .internalUrls |= mangleUrlGroup($halfway.internalUrls)
+			| .externalUrls |= mangleUrlGroup($halfway.externalUrls)
+		else
+			.
+		end
+	else
+		$halfway
+	end;
+
 reduce .[1:][] as $halfway
 (
 	.[0];
-	.origin |= mangle($halfway.origin)
-	| .requestedUrls |= mangle($halfway.requestedUrls)
-	| .requestedUrlsDistinct |= mangle($halfway.requestedUrlsDistinct)
+	.unfiltered |= mangleGroup($halfway.unfiltered)
+	| .successfulOrigin |= mangleGroup($halfway.successfulOrigin)
 )
 EOF
 

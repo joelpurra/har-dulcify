@@ -113,9 +113,8 @@ def coverage:
 		countDistinct
 	};
 
-def mangleShared(root):
-	root as $root
-	| {
+def mangleShared:
+	{
 		counts: {
 			"kinds-resource": {
 				types: ."mime-type".types,
@@ -144,16 +143,30 @@ def mangleShared(root):
 	}
 	| .coverage = (.counts | coverage);
 
-. as $root
-| {
-	origin: {},
-	requestedUrls: {},
-	requestedUrlsDistinct: {}
-}
+def mangleUrlGroup:
+	if . then
+		{
+			requestedUrls: (.requestedUrls | mangleShared),
+			requestedUrlsDistinct: (.requestedUrlsDistinct | mangleShared),
+		}
+	else
+		null
+	end;
 
-| .origin |= (. + ($root.origin | mangleShared($root)))
-| .requestedUrls |= (. + ($root.requestedUrls | mangleShared($root)))
-| .requestedUrlsDistinct |= (. + ($root.requestedUrlsDistinct | mangleShared($root)))
+def mangleGroup:
+	if . then
+		{
+			origin: (.origin | mangleShared),
+			unfilteredUrls: (.unfilteredUrls | mangleUrlGroup),
+			internalUrls: (.internalUrls | mangleUrlGroup),
+			externalUrls: (.externalUrls | mangleUrlGroup),
+		}
+	else
+		null
+	end;
+
+.unfiltered |= mangleGroup
+| .successfulOrigin |= mangleGroup
 EOF
 
 cat | jq "$getAnalysis"

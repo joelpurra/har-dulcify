@@ -165,8 +165,7 @@ def mangleDomain(domain):
 	| ."public-suffices" |= addArrayToKeyCounterObject(($domain."public-suffices" // []) | map(fallbackString));
 
 def mangleUrl(url):
-	. as $aggregatedUrl
-	| url as $url
+	url as $url
 	| .domain |= mangleDomain($url.domain);
 
 def mangleClassification(request):
@@ -262,8 +261,7 @@ def distinctMangleDomain(domain):
 	| ."public-suffices" |= mergeKeyCounterObjects($domain."public-suffices" // {});
 
 def distinctMangleUrl(url):
-	. as $aggregatedUrl
-	| url as $url
+	url as $url
 	| .domain |= distinctMangleDomain($url.domain);
 
 def distinctMangleClassification(request):
@@ -320,28 +318,68 @@ def distinctMangle(request):
 	end
 	| .count += $request.count;
 
-reduce .[] as $request
-(
+def urlsBase:
 	{
-		origin: base,
 		requestedUrls: base,
 		requestedUrlsDistinct: distinctBase
 	};
-	. as $aggregated
-	| .origin |= mangle($request.origin)
-	| .requestedUrls = (
-		reduce $request.requestedUrls[] as $requestedUrl
-		(
-			$aggregated.requestedUrls;
-			mangle($requestedUrl)
-		)
-	)
-	| .requestedUrlsDistinct |= distinctMangle($request.requestedUrlsDistinct)
-)
 
-| .origin.countDistinct = .origin.count
-| .requestedUrls.countDistinct = .requestedUrls.count
-| .requestedUrlsDistinct.countDistinct = .origin.count
+def groupBase:
+	{
+		origin: base,
+		unfilteredUrls: urlsBase,
+		internalUrls: urlsBase,
+		externalUrls: urlsBase,
+	};
+
+def mangleUrlGroup(requestUrls; originCount):
+	requestUrls as $requestUrls
+	| originCount as $originCount
+	| if . then
+		if $requestUrls then
+			.requestedUrls = (
+				reduce $requestUrls.requestedUrls[] as $requestedUrl
+				(
+					.requestedUrls;
+					mangle($requestedUrl)
+				)
+			)
+			| .requestedUrlsDistinct |= distinctMangle($requestUrls.requestedUrlsDistinct)
+			| .requestedUrls.countDistinct = .requestedUrls.count
+			| .requestedUrlsDistinct.countDistinct = $originCount
+		else
+			.
+		end
+	else
+		$requestUrls
+	end;
+
+def mangleGroup(request):
+	request as $request
+	| if . then
+		if $request then
+			.origin |= mangle($request.origin)
+			| .origin.count as $originCount
+			| .origin.countDistinct = $originCount
+			| .unfilteredUrls |= mangleUrlGroup($request.unfilteredUrls; $originCount)
+			| .internalUrls |= mangleUrlGroup($request.internalUrls; $originCount)
+			| .externalUrls |= mangleUrlGroup($request.externalUrls; $originCount)
+		else
+			.
+		end
+	else
+		$request
+	end;
+
+reduce .[] as $request
+(
+	{
+		unfiltered: groupBase,
+		successfulOrigin: groupBase
+	};
+	.unfiltered |= mangleGroup($request.unfiltered)
+	| .successfulOrigin |= mangleGroup($request.successfulOrigin)
+)
 EOF
 
 cat | jq --slurp "$getAggregates"
