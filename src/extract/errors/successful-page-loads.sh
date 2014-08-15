@@ -14,7 +14,7 @@ def isFailedPageLoad:
 			length == 0
 			or
 			(
-				.entries[0].response
+				.[0].response
 				| (
 					type != "object"
 					or
