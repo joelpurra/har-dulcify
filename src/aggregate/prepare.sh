@@ -95,7 +95,7 @@ def mangleUrl:
 		domain: (
 			.domain | {
 					value: .value,
-					"public-suffices": (if ."public-suffices" then (."public-suffices" | map(.original)) else null end)
+					"public-suffixes": (if ."public-suffixes" then (."public-suffixes" | map(.original)) else null end)
 			}
 		)
 	};
@@ -124,7 +124,7 @@ def mangle:
 def distinctMangleDomain(domain):
 	domain as $domain
 	| .value |= setKeyCounterObjectCount($domain.value | fallbackString; 1)
-	| ."public-suffices" |= setArrayToKeyCounterObject(($domain."public-suffices" // []) | map(.idn | fallbackString); 1);
+	| ."public-suffixes" |= setArrayToKeyCounterObject(($domain."public-suffixes" // []) | map(.idn | fallbackString); 1);
 
 def distinctMangleUrl(url):
 	. as $aggregatedUrl
