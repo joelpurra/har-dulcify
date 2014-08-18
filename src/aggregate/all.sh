@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-TEMPORARY=`mktemp -d "$(basename "${BASH_SOURCE}").XXXXXXXX"`
+TEMPORARY=$(mktemp -d "$(basename "${BASH_SOURCE}").XXXXXXXX")
 TEMPOUT1="$TEMPORARY/aggregate.merge.1.json"
 TEMPOUT2="$TEMPORARY/aggregate.merge.2.json"
 trap 'rm -rf "$TEMPORARY"' EXIT
