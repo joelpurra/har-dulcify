@@ -227,6 +227,8 @@ createUniqueVersions() {
 createStats(){
 	mkdir -p "stats"
 
+	cat *.txt | wc > "stats/all.counts.txt"
+
 	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | sort | uniq -c | sort -n > stats/{}.counts.txt"
 	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | wc >> stats/{}.counts.txt"
 
