@@ -44,8 +44,17 @@ def matchEffectiveTld:
 		end
 	);
 
+def getPrivatePrefix(publicSuffixes):
+	(publicSuffixes | length) as $publicSuffixesLength
+	| .[0:length - $publicSuffixesLength];
+
 def mangle:
-	.domain."public-suffixes" = (if .domain.components then (.domain.components | matchEffectiveTld) else null end);
+	if .domain.components then
+		.domain."public-suffixes" = .domain.components | matchEffectiveTld
+		.domain."private-prefixes" = .domain.components | getPrivatePrefix(.domain."public-suffixes")
+	else
+		.
+	end;
 
 .origin.url |= mangle
 | .requestedUrls[].url |= mangle

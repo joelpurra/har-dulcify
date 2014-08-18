@@ -122,7 +122,8 @@ def baseUrl:
 	{
 		domain: {
 			value: {},
-			"public-suffixes": {}
+			"public-suffixes": {},
+			"primary-domain": {}
 		}
 	};
 
@@ -162,7 +163,8 @@ def base:
 def mangleDomain(domain):
 	domain as $domain
 	| .value |= addToKeyCounterObject($domain.value | fallbackString)
-	| ."public-suffixes" |= addArrayToKeyCounterObject(($domain."public-suffixes" // []) | map(fallbackString));
+	| ."public-suffixes" |= addArrayToKeyCounterObject(($domain."public-suffixes" // []) | map(fallbackString))
+	| ."primary-domain" |= addToKeyCounterObject($domain."primary-domain" | fallbackString);
 
 def mangleUrl(url):
 	url as $url
@@ -218,7 +220,8 @@ def distinctBaseUrl:
 	{
 		domain: {
 			value: {},
-			"public-suffixes": {}
+			"public-suffixes": {},
+			"primary-domain": {}
 		}
 	};
 
@@ -258,7 +261,8 @@ def distinctBase:
 def distinctMangleDomain(domain):
 	domain as $domain
 	| .value |= mergeKeyCounterObjects($domain.value // {})
-	| ."public-suffixes" |= mergeKeyCounterObjects($domain."public-suffixes" // {});
+	| ."public-suffixes" |= mergeKeyCounterObjects($domain."public-suffixes" // {})
+	| ."primary-domain" |= mergeKeyCounterObjects($domain."primary-domain" // {});
 
 def distinctMangleUrl(url):
 	url as $url

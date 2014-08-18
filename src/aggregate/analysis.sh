@@ -63,6 +63,7 @@ def mangleUrl:
 	{
 		domains: .domain.value | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
 		"public-suffixes": .domain."public-suffixes" | nullFalllbackEmptyObject,
+		"primary-domain": .domain."primary-domain" | nullFalllbackEmptyObject,
 	};
 
 def mangleBlocks:
@@ -89,7 +90,8 @@ def coverageKeyCounterObject(countDistinct):
 def coverageUrl(countDistinct):
 	countDistinct as $countDistinct
 	| .domains |= coverageKeyCounterObject($countDistinct)
-	| ."public-suffixes" |= coverageKeyCounterObject($countDistinct);
+	| ."public-suffixes" |= coverageKeyCounterObject($countDistinct)
+	| ."primary-domain" |= coverageKeyCounterObject($countDistinct);
 
 def coverage:
 	.countDistinct as $countDistinct
