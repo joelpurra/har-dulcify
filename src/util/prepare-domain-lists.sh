@@ -232,9 +232,11 @@ createStats(){
 	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | sort | uniq -c | sort -n > stats/{}.counts.txt"
 	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | wc >> stats/{}.counts.txt"
 
+	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | grep --extended-regex --only-matching '[^.]+$' | rev | sort | rev | uniq -c | sort -n > stats/{}.tld.counts.txt"
+
 	# Simplified second level grouping/sort - should be split(".") | reverse | join(".") | sort | split(".") | reverse | join(".").
-	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | grep --extended-regex '\..+\.[a-z]+$' | rev | sort | rev > stats/{}.secondlevel.txt"
-	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | grep --extended-regex --only-matching '\..+\.[a-z]+$' | rev | sort | rev | uniq -c | sort -n > stats/{}.secondlevel.counts.txt"
+	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | grep --extended-regex '\..+\.[^.]+$' | rev | sort | rev > stats/{}.secondlevel.txt"
+	ls *.txt | xargs -I '{}' -n 1 -- sh -c "cat {} | grep --extended-regex --only-matching '\..+\.[^.]+$' | rev | sort | rev | uniq -c | sort -n > stats/{}.secondlevel.counts.txt"
 }
 
 processFolder() {
