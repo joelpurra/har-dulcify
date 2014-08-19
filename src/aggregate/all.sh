@@ -31,6 +31,7 @@ getJsonObjectCount() {
 }
 
 getMergedObjectCount() {
+	previousMergedObjectCount="$mergedObjectCount"
 	mergedObjectCount=$(cat "$TEMPOUT1" | getJsonObjectCount)
 }
 
@@ -39,8 +40,17 @@ cat | "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/prepare2
 
 getMergedObjectCount
 
-while (( $mergedObjectCount > 2 )); do
+while (( mergedObjectCount >= 3 && previousMergedObjectCount != mergedObjectCount )); do
 	cat "$TEMPOUT1" | "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/merge.sh" > "$TEMPOUT2"
+	mv "$TEMPOUT2" "$TEMPOUT1"
+	getMergedObjectCount
+done
+
+# Skip the next step if the number is 1.
+previousMergedObjectCount=1
+
+while (( mergedObjectCount >= 3 && previousMergedObjectCount != mergedObjectCount )); do
+	cat "$TEMPOUT1" | "${BASH_SOURCE%/*}/../util/parallel-n-2.sh" "${BASH_SOURCE%/*}/merge.sh" > "$TEMPOUT2"
 	mv "$TEMPOUT2" "$TEMPOUT1"
 	getMergedObjectCount
 done
