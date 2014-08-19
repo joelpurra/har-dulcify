@@ -63,7 +63,7 @@ def mangleUrl:
 	{
 		domains: .domain.value | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
 		"public-suffixes": .domain."public-suffixes" | nullFalllbackEmptyObject,
-		"primary-domain": .domain."primary-domain" | nullFalllbackEmptyObject,
+		"primary-domain": .domain."primary-domain" | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
 	};
 
 def mangleBlocks:

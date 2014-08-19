@@ -45,13 +45,15 @@ def matchEffectiveTld:
 	);
 
 def getPrivatePrefix(publicSuffixes):
-	(publicSuffixes | length) as $publicSuffixesLength
-	| .[0:length - $publicSuffixesLength];
+	publicSuffixes as $publicSuffixes
+	| ($publicSuffixes | length) as $publicSuffixesLength
+	| .[0:(length - $publicSuffixesLength)];
 
 def mangle:
-	if .domain.components then
-		.domain."public-suffixes" = .domain.components | matchEffectiveTld
-		.domain."private-prefixes" = .domain.components | getPrivatePrefix(.domain."public-suffixes")
+	if . and .domain and .domain.components and (.domain.components | type) == "array" and (.domain.components | length) > 0 then
+		(.domain.components | matchEffectiveTld) as $currentSuffixes
+		| .domain."public-suffixes" = $currentSuffixes
+		| .domain."private-prefixes" = (.domain.components | getPrivatePrefix($currentSuffixes))
 	else
 		.
 	end;
