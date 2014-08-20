@@ -62,7 +62,7 @@ def nullFalllbackEmptyObject:
 def mangleUrl:
 	{
 		domains: .domain.value | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
-		"public-suffixes": .domain."public-suffixes" | nullFalllbackEmptyObject,
+		"public-suffixes": .domain."public-suffixes" | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
 		"primary-domain": .domain."primary-domain" | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
 	};
 
@@ -119,12 +119,12 @@ def mangleShared:
 	{
 		counts: {
 			"kinds-resource": {
-				types: ."mime-type".types,
-				groups: ."mime-type".groups
+				types: (."mime-type".types | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject),
+				groups: (."mime-type".groups | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject)
 			},
 			"request-status": {
-				codes: .status.codes,
-				groups: .status.groups
+				codes: (.status.codes | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject),
+				groups: (.status.groups | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject)
 			},
 			classification: {
 				"is-same-domain": .classification.isSameDomain,
