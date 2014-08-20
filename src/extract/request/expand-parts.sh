@@ -490,25 +490,40 @@ def mimeTypeGrouping:
 		"application/javascript": "script",
 		"application/x-javascript": "script",
 		"text/javascript": "script",
+		"text/x-js": "script",
 
 		"application/font-woff": "font",
 		"application/x-woff": "font",
 		"application/x-font-ttf": "font",
+		"application/x-font-otf": "font",
 		"font/ttf": "font",
 		"font/opentype": "font",
+		"font/woff": "font",
 
 		"application/json": "data",
 		"application/octet-stream": "data",
+		"binary/octet-stream": "data",
 		"application/xml": "data",
+		"text/xml": "data",
 
 		"image/gif": "image",
 		"image/jpeg": "image",
+		"image/jpg": "image",
+		"image/pjpeg": "image",
 		"image/png": "image",
+		"image/x-png": "image",
+		"image/bmp": "image",
 		"image/svg+xml": "image",
 
-		"text/css": "style",
 		"text/html": "html",
+		"application/xhtml+xml": "html",
+
+		"text/css": "style",
 		"text/plain": "text",
+
+		"application/pdf": "document",
+
+		"application/x-shockwave-flash": "object",
 	} as $typeLookup
 	| $typeLookup[.];
 
