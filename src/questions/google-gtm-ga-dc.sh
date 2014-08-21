@@ -17,9 +17,11 @@ select(
 			and (
 				.url
 				| (
-					.original
+					.valid
+					and
+					.value
 					and (
-						.original
+						.value
 						| contains("googletagmanager.com/gtm.js")
 					)
 				)
@@ -28,28 +30,28 @@ select(
 	)
 )
 | {
-	origin: .origin.url.domain.original,
+	origin: .origin.url.domain.value,
 	requests: (
 		.requestedUrls
 		| map(
 			select(
 				.url
 				and
-				.url.original
+				.url.value
 				and
 				.url.domain
 				and
-				.url.domain.original
+				.url.domain.value
 			)
 			| select(
-				.url.domain.original
+				.url.domain.value
 				| (
 					contains("doubleclick")
 					or
 					contains("google")
 				)
 			)
-			| .url.original
+			| .url.value
 		)
 	)
 }
