@@ -19,20 +19,28 @@ write(){
 	cat > "$(filename "$1")"
 }
 
+T(){
+	tee "$(filename "$1")"
+}
+
 clean(){
-	sed -e 's/.*,//' -e 's_/.*__' "$(filename "$1")" | awk '!_[$0]++'
+	sed -e 's/.*,//' -e 's_/.*__' | awk '!_[$0]++' | write "$1"
+}
+
+top10k(){
+	head -n 10000 "$@"
+}
+
+shuffle(){
+	gshuf "$@"
 }
 
 mkdir "$timestamp"
 
-head -n 10000 "$input" | write "top.10000"
-gshuf "$input" | head -n 10000 | write "random.10000"
-
-clean "top.10000" | write "top.10000.clean"
-clean "random.10000" | write "random.10000.clean"
+top10k "$input" | T "top.10000" | clean "top.10000.clean"
+shuffle "$input" | top10k | T "random.10000" | clean "random.10000.clean"
 
 for tld in "${tlds[@]}"
 do
-	grep "\\.$tld\$" "$input" | head -n 10000 | write "top.10000.$tld"
-	clean "top.10000.$tld" | write "top.10000.$tld.clean"
+	grep "\\.$tld\$" "$input" | top10k | T "top.10000.$tld" | clean "top.10000.$tld.clean"
 done
