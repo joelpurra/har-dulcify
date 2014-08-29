@@ -47,31 +47,6 @@ T(){
 	tee "$(filename "$1")"
 }
 
-read(){
-	cat "$(filename "$1")"
-}
-
-
-
-
-tempFilename(){
-	echo "$TEMPORARY/$(filename "$1")"
-}
-
-writeTemp(){
-	cat > "$(tempFilename "$1")"
-}
-
-Ttemp(){
-	tee "$(filename "$1")"
-}
-
-readTemp(){
-	cat "$(tempFilename "$1")"
-}
-
-
-
 top10k(){
 	head -n 10000 "$@"
 }
@@ -84,10 +59,6 @@ extractDomains(){
 	sedExtRegexp -e "1,/^${ZONESUFFIX}\./ d" -e '/^[^ ]+ NS / ! d' -e 's/^([^ ]+) .*$/\1/' -e 's/./\L&/g' -e "s/\$/.${zoneSuffix}/" "$@"
 }
 
-differ(){
-	diff --unified "$(filename "$1")" "$(filename "$2")"
-}
-
 unique(){
 	# Using `uniq` instead of  `sort -u` as indata is already grouped by domain.
 	uniq
@@ -95,30 +66,4 @@ unique(){
 
 mkdir "$timestamp"
 
-# DEBUGGING
-# Used to test the difference between `uniq` and `sort -u` on this indata.
-# `uniq` is a lot faster, and the indata is grouped by domain after filtering; `sort -u` isn't necessary.
-# echo extract
-# time extractDomains "$input" | write "t"
-
-# echo uniq
-# time read "t" | uniq | write "u"
-
-# echo sort -u
-# time read "t" | sort -u | write "su"
-
-# echo uniq sort
-# time read "u" | sort | write "us"
-
-# echo differ
-# time differ "su" "us" | write "d"
-
-# echo done diffing
-
-# echo extract+unique
-# time extractDomains "$input" | unique | write "unique"
-# echo shuffle+top10k
-# time read "unique" | shuffle | top10k | write "random.10000"
-
-# echo extract+unique+shuffle+top10k
 extractDomains | unique | T "unique" | shuffle | top10k | write "random.10000"
