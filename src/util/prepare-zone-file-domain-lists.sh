@@ -14,7 +14,6 @@ outputDir="$timestamp"
 outputPrefix="$outputDir/zone.$zoneSuffix."
 outputSuffix=".$timestamp.txt"
 
-# TODO: check for shuf, use gshuf as a fallback.
 shuffler="$(which shuf || which gshuf || "" 2>/dev/null)"
 [[ -z shuffler ]] && { echo "shuf/gshuf is required" 1>&2; exit 1; }
 

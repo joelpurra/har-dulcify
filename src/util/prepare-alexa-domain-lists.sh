@@ -8,8 +8,8 @@ outputDir="$timestamp"
 outputPrefix="$outputDir/alexa."
 outputSuffix=".$timestamp.txt"
 
-# TODO: check for shuf, use gshuf as a fallback.
-[[ -z $(which gshuf) ]] && { echo "gshuf is required" 1>&2; exit 1; }
+shuffler="$(which shuf || which gshuf || "" 2>/dev/null)"
+[[ -z shuffler ]] && { echo "shuf/gshuf is required" 1>&2; exit 1; }
 
 filename(){
 	echo "$outputPrefix$1$outputSuffix"
@@ -32,7 +32,7 @@ top10k(){
 }
 
 shuffle(){
-	gshuf "$@"
+	"$shuffler" "$@"
 }
 
 mkdir "$timestamp"
