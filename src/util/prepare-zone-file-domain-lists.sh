@@ -33,7 +33,6 @@ sedExtRegexp() {
 	"${sedExec[@]}" "$@"
 }
 
-
 filename(){
 	echo "$outputPrefix$1$outputSuffix"
 }
@@ -46,6 +45,10 @@ T(){
 	tee "$(filename "$1")"
 }
 
+read(){
+	cat "$(filename "$1")"
+}
+
 top10k(){
 	head -n 10000 "$@"
 }
@@ -54,8 +57,12 @@ shuffle(){
 	"$shuffler" "$@"
 }
 
-extractDomains(){
-	sedExtRegexp -e "1,/^${ZONESUFFIX}\./ d" -e '/^[^ ]+ NS / ! d' -e 's/^([^ ]+) .*$/\1/' -e 's/./\L&/g' -e "s/\$/.${zoneSuffix}/" "$@"
+parallelizedExtractDomains(){
+	parallel --pipe --keep-order --group --block 10M "${sedExec[@]}" -e '"/^[^ ]+ NS / ! d"' -e '"s/^([^ ]+) .*$/\1/"'
+}
+
+parallelizedCleanDomains(){
+	parallel --pipe --keep-order --group --block 10M "${sedExec[@]}" -e '"s/./\L&/g"' -e "'s/\$/.${zoneSuffix}/'"
 }
 
 unique(){
@@ -65,4 +72,4 @@ unique(){
 
 mkdir "$timestamp"
 
-extractDomains | unique | T "unique" | shuffle | top10k | write "random.10000"
+cat | parallelizedExtractDomains | unique | parallelizedCleanDomains | T "unique" | shuffle | top10k | write "random.10000"
