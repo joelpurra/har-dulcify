@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+input="${1:-top-1m.csv}"
+
 declare -a tlds=("se" "dk")
-input="top-1m.csv"
 timestamp=$(date -u +%FT%TZ | tr -d ':')
 outputDir="$timestamp"
 outputPrefix="$outputDir/alexa."
