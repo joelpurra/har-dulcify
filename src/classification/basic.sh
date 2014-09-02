@@ -6,9 +6,17 @@ def isSameDomain(domain):
 	domain as $domain
 	| . == $domain;
 
+# TODO: compare subdomain with Public Suffix List for verification?
 def isSubdomain(domain):
 	domain as $domain
 	| endswith("." + $domain);
+
+# TODO: compare superdomain with Public Suffix List for verification?
+def isSuperdomain(domain):
+	. as $original
+	| domain as $domain
+	| $domain
+	| isSubdomain($original);
 
 def isSecure:
 	. == "https";
@@ -16,13 +24,17 @@ def isSecure:
 def classifyUrl(origin):
 	origin as $origin
 	# TODO: work on .domain.components, not .domain.value?
-	| (if (.domain.value and $origin.domain.value) then (.domain.value | isSameDomain($origin.domain.value)) else false end) as $isSameDomain
-	| (if (.domain.value and $origin.domain.value) then (.domain.value | isSubdomain($origin.domain.value)) else false end) as $isSubdomain
+	| (.domain.value and $origin.domain.value) as $hasDomainValue
+	| (if $hasDomainValue then (.domain.value | isSameDomain($origin.domain.value)) else false end) as $isSameDomain
+	| (if $hasDomainValue then (.domain.value | isSubdomain($origin.domain.value)) else false end) as $isSubdomain
+	| (if $hasDomainValue then (.domain.value | isSuperdomain($origin.domain.value)) else false end) as $isSuperdomain
+	| ($isSameDomain or $isSubdomain or $isSuperdomain) as $isInternalDomain
 	| {
 		isSameDomain: $isSameDomain,
 		isSubdomain: $isSubdomain,
-		isInternalDomain: ($isSameDomain or $isSubdomain),
-		isExternalDomain: (($isSameDomain or $isSubdomain) | not),
+		isSuperdomain: $isSuperdomain,
+		isInternalDomain: $isInternalDomain,
+		isExternalDomain: ($isInternalDomain | not),
 		isSecure: (if (.scheme and .scheme.valid and .scheme.value) then (.scheme.value | isSecure) else false end)
 	};
 

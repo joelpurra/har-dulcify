@@ -132,6 +132,7 @@ def base:
 		classification: {
 			isSameDomain: 0,
 			isSubdomain: 0,
+			isSuperdomain: 0,
 			isInternalDomain: 0,
 			isExternalDomain: 0,
 			isSuccessful: 0,
@@ -174,6 +175,7 @@ def mangleClassification(request):
 	request as $request
 	| .classification.isSameDomain += ($request.classification.isSameDomain | boolToInt)
 	| .classification.isSubdomain += ($request.classification.isSubdomain | boolToInt)
+	| .classification.isSuperdomain += ($request.classification.isSuperdomain | boolToInt)
 	| .classification.isInternalDomain += ($request.classification.isInternalDomain | boolToInt)
 	| .classification.isExternalDomain += ($request.classification.isExternalDomain | boolToInt)
 	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)
@@ -230,6 +232,7 @@ def distinctBase:
 		classification: {
 			isSameDomain: 0,
 			isSubdomain: 0,
+			isSuperdomain: 0,
 			isInternalDomain: 0,
 			isExternalDomain: 0,
 			isSuccessful: 0,
@@ -272,6 +275,7 @@ def distinctMangleClassification(request):
 	request as $request
 	| .classification.isSameDomain += ($request.classification.isSameDomain | boolToInt)
 	| .classification.isSubdomain += ($request.classification.isSubdomain | boolToInt)
+	| .classification.isSuperdomain += ($request.classification.isSuperdomain | boolToInt)
 	| .classification.isInternalDomain += ($request.classification.isInternalDomain | boolToInt)
 	| .classification.isExternalDomain += ($request.classification.isExternalDomain | boolToInt)
 	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)

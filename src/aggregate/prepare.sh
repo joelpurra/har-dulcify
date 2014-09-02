@@ -165,6 +165,7 @@ def distinctMangle:
 			classification: {
 				isSameDomain: (.[0].classification.isSameDomain // false),
 				isSubdomain: (.[0].classification.isSubdomain // false),
+				isSuperdomain: (.[0].classification.isSuperdomain // false),
 				isInternalDomain: (.[0].classification.isInternalDomain // false),
 				isExternalDomain: (.[0].classification.isExternalDomain // false),
 				isSuccessful: (.[0].classification.isSuccessful // false),
@@ -193,6 +194,7 @@ def distinctMangle:
 		};
 		.classification.isSameDomain = (.classification.isSameDomain and $request.classification.isSameDomain)
 		| .classification.isSubdomain = (.classification.isSubdomain and $request.classification.isSubdomain)
+		| .classification.isSuperdomain = (.classification.isSuperdomain and $request.classification.isSuperdomain)
 		| .classification.isInternalDomain = (.classification.isInternalDomain and $request.classification.isInternalDomain)
 		| .classification.isExternalDomain = (.classification.isExternalDomain and $request.classification.isExternalDomain)
 		| .classification.isSuccessful = (.classification.isSuccessful and $request.classification.isSuccessful)

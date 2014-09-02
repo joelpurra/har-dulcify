@@ -129,6 +129,7 @@ def mangleShared:
 			classification: {
 				"is-same-domain": .classification.isSameDomain,
 				"is-subdomain": .classification.isSubdomain,
+				"is-superdomain": .classification.isSuperdomain,
 				"is-internal-domain": .classification.isInternalDomain,
 				"is-external-domain": .classification.isExternalDomain,
 				"is-successful-request": .classification.isSuccessful,
