@@ -136,7 +136,7 @@ def mangleShared:
 				"is-unsuccessful-request": .classification.isUnsuccessful,
 				"is-failed-request": .classification.isFailed,
 				"is-secure-request": .classification.isSecure,
-				"is-insecure-request": (.countDistinct - .classification.isSecure),
+				"is-insecure-request": .classification.isInsecure,
 			},
 			urls: .url | mangleUrl,
 			blocks: mangleBlocks,

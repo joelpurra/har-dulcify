@@ -138,7 +138,8 @@ def base:
 			isSuccessful: 0,
 			isUnsuccessful: 0,
 			isFailed: 0,
-			isSecure: 0
+			isSecure: 0,
+			isInsecure: 0,
 		},
 		"mime-type": {
 			types: {},
@@ -181,7 +182,8 @@ def mangleClassification(request):
 	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)
 	| .classification.isUnsuccessful += ($request.classification.isUnsuccessful | boolToInt)
 	| .classification.isFailed += ($request.classification.isFailed | boolToInt)
-	| .classification.isSecure += ($request.classification.isSecure | boolToInt);
+	| .classification.isSecure += ($request.classification.isSecure | boolToInt)
+	| .classification.isInsecure += ($request.classification.isInsecure | boolToInt);
 
 def mangleDisconnect(disconnect):
 	disconnect as $disconnect
@@ -238,7 +240,8 @@ def distinctBase:
 			isSuccessful: 0,
 			isUnsuccessful: 0,
 			isFailed: 0,
-			isSecure: 0
+			isSecure: 0,
+			isInsecure: 0,
 		},
 		"mime-type": {
 			types: {},
@@ -281,7 +284,8 @@ def distinctMangleClassification(request):
 	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)
 	| .classification.isUnsuccessful += ($request.classification.isUnsuccessful | boolToInt)
 	| .classification.isFailed += ($request.classification.isFailed | boolToInt)
-	| .classification.isSecure += ($request.classification.isSecure | boolToInt);
+	| .classification.isSecure += ($request.classification.isSecure | boolToInt)
+	| .classification.isInsecure += ($request.classification.isInsecure | boolToInt);
 
 def distinctMangleDisconnect(disconnect):
 	disconnect as $disconnect

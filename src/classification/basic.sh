@@ -29,13 +29,15 @@ def classifyUrl(origin):
 	| (if $hasDomainValue then (.domain.value | isSubdomain($origin.domain.value)) else false end) as $isSubdomain
 	| (if $hasDomainValue then (.domain.value | isSuperdomain($origin.domain.value)) else false end) as $isSuperdomain
 	| ($isSameDomain or $isSubdomain or $isSuperdomain) as $isInternalDomain
+	| (if (.scheme and .scheme.valid and .scheme.value) then (.scheme.value | isSecure) else false end) as $isSecure
 	| {
 		isSameDomain: $isSameDomain,
 		isSubdomain: $isSubdomain,
 		isSuperdomain: $isSuperdomain,
 		isInternalDomain: $isInternalDomain,
 		isExternalDomain: ($isInternalDomain | not),
-		isSecure: (if (.scheme and .scheme.valid and .scheme.value) then (.scheme.value | isSecure) else false end)
+		isSecure: $isSecure,
+		isInsecure: ($isSecure | not)
 	};
 
 def statusIsSuccessful:

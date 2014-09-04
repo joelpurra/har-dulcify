@@ -171,7 +171,8 @@ def distinctMangle:
 				isSuccessful: (.[0].classification.isSuccessful // false),
 				isUnsuccessful: (.[0].classification.isUnsuccessful // false),
 				isFailed: (.[0].classification.isFailed // false),
-				isSecure: (.[0].classification.isSecure // false)
+				isSecure: (.[0].classification.isSecure // false),
+				isInsecure: (.[0].classification.isInsecure // false),
 			},
 			"mime-type": {
 				types: {},
@@ -201,6 +202,7 @@ def distinctMangle:
 		| .classification.isUnsuccessful = (.classification.isUnsuccessful and $request.classification.isUnsuccessful)
 		| .classification.isFailed = (.classification.isFailed and $request.classification.isFailed)
 		| .classification.isSecure = (.classification.isSecure and $request.classification.isSecure)
+		| .classification.isInsecure = (.classification.isInsecure and $request.classification.isInsecure)
 		| ."mime-type" |= distinctMangleMimeType($request."mime-type")
 		| .status |= distinctMangleStatus($request.status)
 		| .url |= distinctMangleUrl($request.url)
