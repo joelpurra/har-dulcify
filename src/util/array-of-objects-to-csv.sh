@@ -7,7 +7,8 @@ def objectAsCsv(keyOrValue):
 	| map(
 		keyOrValue
 	)
-	| @csv;
+	| @csv
+	| . + "\\r";
 
 def toHeader:
 	objectAsCsv(.key);
