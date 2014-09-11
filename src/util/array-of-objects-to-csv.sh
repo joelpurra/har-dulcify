@@ -2,21 +2,19 @@
 set -e
 
 read -d '' getCSV <<-'EOF' || true
-def toHeader:
+def objectAsCsv(keyOrValue):
 	to_entries
 	| map(
-		.key
+		keyOrValue
 		| @text
 	)
 	| @csv;
 
+def toHeader:
+	objectAsCsv(.key);
+
 def toLine:
-	to_entries
-	| map(
-		.value
-		| @text
-	)
-	| @csv;
+	objectAsCsv(.value);
 
 def toLines:
 	map(toLine)
