@@ -6,7 +6,6 @@ def objectAsCsv(keyOrValue):
 	to_entries
 	| map(
 		keyOrValue
-		| @text
 	)
 	| @csv;
 
