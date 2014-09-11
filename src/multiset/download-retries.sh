@@ -11,7 +11,7 @@ set -e
 # OUTPUT:
 # 	"datasets.retries.json"			Retry counts and coverage.
 # 	"datasets.retries.rates.json"	Rates and rate of change calculated.
-# 	"datasets.retries.rates.csv"	CSV version.
+# 	"datasets.retries.rates.tsv"	TSV version.
 
 aggregatesAnalysisJson="aggregates.analysis.json"
 
@@ -73,7 +73,7 @@ sort_by(.dataset)
 )
 EOF
 
-read -d '' renameForCsvColumnOrdering <<-'EOF' || true
+read -d '' renameForTsvColumnOrdering <<-'EOF' || true
 map(
 	{
 		"01--Dataset": .dataset,
@@ -89,4 +89,4 @@ EOF
 
 <"datasets.retries.json" jq "$mapData" | "${BASH_SOURCE%/*}/../util/to-array.sh" | jq "$calculateRate" >"datasets.retries.rates.json"
 
-<"datasets.retries.rates.json" jq "$renameForCsvColumnOrdering" | "${BASH_SOURCE%/*}/../util/array-of-objects-to-csv.sh" | "${BASH_SOURCE%/*}/../util/clean-csv-sorted-header.sh" >"datasets.retries.rates.csv"
+<"datasets.retries.rates.json" jq "$renameForTsvColumnOrdering" | "${BASH_SOURCE%/*}/../util/array-of-objects-to-tsv.sh" | "${BASH_SOURCE%/*}/../util/clean-tsv-sorted-header.sh" >"datasets.retries.rates.tsv"
