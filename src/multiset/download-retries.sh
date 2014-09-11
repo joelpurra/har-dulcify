@@ -89,4 +89,4 @@ EOF
 
 <"datasets.retries.json" jq "$mapData" | "${BASH_SOURCE%/*}/../util/to-array.sh" | jq "$calculateRate" >"datasets.retries.rates.json"
 
-<"datasets.retries.rates.json" jq "$renameForCsvColumnOrdering" | "${BASH_SOURCE%/*}/../util/array-of-objects-to-csv.sh" | sed '1s/"[[:digit:]][[:digit:]]--/"/g' >"datasets.retries.rates.csv"
+<"datasets.retries.rates.json" jq "$renameForCsvColumnOrdering" | "${BASH_SOURCE%/*}/../util/array-of-objects-to-csv.sh" | "${BASH_SOURCE%/*}/../util/clean-csv-sorted-header.sh" >"datasets.retries.rates.csv"
