@@ -7,8 +7,7 @@ def objectAsCsv(keyOrValue):
 	| map(
 		keyOrValue
 	)
-	| @csv
-	| . + "\\r";
+	| @csv;
 
 def toHeader:
 	objectAsCsv(.key);
@@ -18,7 +17,7 @@ def toLine:
 
 def toLines:
 	map(toLine)
-	| join("\\n");
+	| join("\\r\\n");
 
 (.[0] | toHeader),
 toLines
