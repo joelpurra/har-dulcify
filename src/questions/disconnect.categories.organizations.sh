@@ -39,9 +39,12 @@ def domainWithValue:
 	| map(
 		reduce .[1:][] as $item (
 			.[0]
-			| .domains = domainWithValue;
+			| .domains = domainWithValue
+			| .sum = .value
+			| del(.value);
 			.domains += ($item | domainWithValue)
-			| .value += $item.value
+			# The .sum isn't representative as it doesn't represent coverage any more.
+			| .sum += $item.value
 		)
 		| .domains |= (
 			to_entries
@@ -52,6 +55,10 @@ def domainWithValue:
 	)
 	| sort_by(.value)
 	| reverse
+	# Delete .sum as the number can only be used for sorting.
+	| map(
+		del(.sum)
+	)
 )
 EOF
 
