@@ -21,15 +21,21 @@ read -d '' getRetriesCountsQueries <<-'EOF' || true
 	domains: {
 		counts: {
 			all: .unfiltered.origin.counts.count,
+			successful: .unfiltered.origin.counts.classification."is-successful-request",
+			unsuccessful: .unfiltered.origin.counts.classification."is-unsuccessful-request",
 			failed: .unfiltered.origin.counts.classification."is-failed-request",
-			"not-failed": .successfulOrigin.origin.counts.count
+			"non-failed": .successfulOrigin.origin.counts.count
+		},
+		coverage: {
+			successful: .unfiltered.origin.coverage.classification."is-successful-request",
+			unsuccessful: .unfiltered.origin.coverage.classification."is-unsuccessful-request",
+			failed: .unfiltered.origin.coverage.classification."is-failed-request",
 		}
 	}
 }
-| .domains.coverage = {
+| .domains.coverage += {
 	all: 1,
-	failed: (.domains.counts.failed / .domains.counts.all),
-	"not-failed": (.domains.counts."not-failed" / .domains.counts.all)
+	"non-failed": (.domains.counts."non-failed" / .domains.counts.all)
 }
 EOF
 
@@ -37,11 +43,18 @@ read -d '' mapData <<-'EOF' || true
 {
 	dataset: (.path | split("/")[-1:][0]),
 	domains: .domains.counts.all,
+	successful: .domains.counts.successful,
+	unsuccessful: .domains.counts.unsuccessful,
+	"non-failed": .domains.counts."non-failed",
 	failed: .domains.counts.failed,
-	rate: .domains.coverage.failed
+	"success-rate": .domains.coverage.successful,
+	"unsuccess-rate": .domains.coverage.unsuccessful,
+	"non-failure-rate": .domains.coverage."non-failed",
+	"failure-rate": .domains.coverage.failed,
 }
 EOF
 
+# The change rate is only useful if used on subsequent download retries of the same domain list/dataset.
 read -d '' calculateRate <<-'EOF' || true
 def rateOfChange(previous; current):
 	previous as $previous
@@ -56,7 +69,7 @@ sort_by(.dataset)
 		.[0]
 	];
 	. as $current
-	| $current[-1:][0].rate as $prevRate
+	| $current[-1:][0]."failure-rate" as $prevRate
 	| $current
 	+ [
 		$item
@@ -65,7 +78,7 @@ sort_by(.dataset)
 				if $prevRate == 0 then
 					"-"
 				else
-					rateOfChange($prevRate; $item.rate)
+					rateOfChange($prevRate; $item."failure-rate")
 				end
 			)
 		}
@@ -78,9 +91,15 @@ map(
 	{
 		"01--Dataset": .dataset,
 		"02--Domains": .domains,
-		"03--Failed": .failed,
-		"04--Failure Rate": .rate,
-		"05--Rate of Change": .rateOfChange
+		"03--Successful": .successful,
+		"04--Unsuccessful": .unsuccessful,
+		"05--Non-failed": ."non-failed",
+		"06--Failed": .failed,
+		"07--Success rate": ."success-rate",
+		"08--Unsuccess rate": ."unsuccess-rate",
+		"09--Non-failure rate": ."non-failure-rate",
+		"10--Failure rate": ."failure-rate",
+		"11--Rate of change": .rateOfChange
 	}
 )
 EOF
