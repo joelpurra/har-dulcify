@@ -25,6 +25,7 @@ read -d '' mapData <<-'EOF' || true
 	"is-superdomain",
 	"is-internal-domain",
 	"is-external-domain",
+	"is-mixed-domain": (1 - ."is-internal-domain" - ."is-external-domain"),
 }
 EOF
 
@@ -38,6 +39,7 @@ map(
 		"05--Superdomain": ."is-superdomain",
 		"06--Internal domain": ."is-internal-domain",
 		"07--External domain": ."is-external-domain",
+		"08--Mixed": ."is-mixed-domain",
 	}
 )
 EOF
