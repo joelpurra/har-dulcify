@@ -35,7 +35,7 @@ EOF
 
 read -d '' mapData <<-'EOF' || true
 {
-	dataset: (.path | split("/")[-2:] | join("/")),
+	dataset: (.path | split("/")[-1:][0]),
 	domains: .domains.counts.all,
 	failed: .domains.counts.failed,
 	rate: .domains.coverage.failed

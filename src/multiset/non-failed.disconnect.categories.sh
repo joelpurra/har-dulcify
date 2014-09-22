@@ -13,7 +13,7 @@ EOF
 
 read -d '' mapData <<-'EOF' || true
 {
-	dataset: (.path | split("/")[-2:] | join("/")),
+	dataset: (.path | split("/")[-1:][0]),
 	"non-failed-domains",
 	"Disconnect": (.categories.Disconnect // 0),
 	"Content": (.categories.Content // 0),
@@ -27,7 +27,7 @@ read -d '' renameForTsvColumnOrdering <<-'EOF' || true
 map(
 	{
 		"01--Dataset": .dataset,
-		"02--Non-failed domains": ."non-failed-domains",
+		"02--Domains": ."non-failed-domains",
 		"03--Disconnect": .Disconnect,
 		"04--Content": .Content,
 		"05--Advertising": .Advertising,
