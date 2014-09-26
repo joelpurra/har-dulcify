@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-read -d '' classifyExpandedParts <<-'EOF' || true
+read -d '' prepareServiceList <<-'EOF' || true
 def toNullOrSingleValueOrArray:
 	if length == 0 then
 		# Replace an empty array with null.
@@ -71,4 +71,4 @@ def transformRawDisconnect:
 | transformRawDisconnect
 EOF
 
-cat | jq "$classifyExpandedParts"
+cat | jq "$prepareServiceList"

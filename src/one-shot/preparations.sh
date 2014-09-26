@@ -17,5 +17,5 @@ download "https://services.disconnect.me/disconnect-plaintext.json"
 
 
 download "https://publicsuffix.org/list/effective_tld_names.dat"
-<"effective_tld_names.dat" "${BASH_SOURCE%/*}/../classification/effective-tld/prepare-list.sh" > "prepared.effective-tld.json"
+<"effective_tld_names.dat" "${BASH_SOURCE%/*}/../classification/public-suffix/prepare-list.sh" > "prepared.public-suffix.json"
 

@@ -20,11 +20,11 @@ domainroot=$(cd -- "$domainroot"; echo "$PWD")
 # Expand parts by splitting them up to parts
 <"domains.parts.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../extract/request/expand-parts.sh" > "domains.parts.expanded.json"
 
+# Add public suffix domain grouping
+<"domains.parts.expanded.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/public-suffix/add.sh" "prepared.public-suffix.json" > "domains.parts.expanded.public-suffix.json"
+
 # Add basic classifications
-<"domains.parts.expanded.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/basic.sh" > "domains.parts.expanded.classified.json"
+<"domains.parts.expanded.public-suffix.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/basic.sh" > "domains.parts.expanded.public-suffix.classified.json"
 
-# Add disconnect's block matching
-<"domains.parts.expanded.classified.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/disconnect/add.sh" "prepared.disconnect.services.json" > "domains.parts.expanded.classified.disconnect.json"
-
-# Add effective tld domain grouping
-<"domains.parts.expanded.classified.disconnect.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/effective-tld/add.sh" "prepared.effective-tld.json" > "domains.parts.expanded.classified.disconnect.effective-tld.json"
+# # Add disconnect's block matching
+<"domains.parts.expanded.public-suffix.classified.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../classification/disconnect/add.sh" "prepared.disconnect.services.json" > "domains.parts.expanded.public-suffix.classified.disconnect.json"

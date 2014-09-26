@@ -96,7 +96,7 @@ def mangleUrl:
 			.domain | {
 					value: .value,
 					"public-suffixes": (if ."public-suffixes" then (."public-suffixes" | map(.idn | fallbackString)) else null end),
-					"primary-domain": (if ."private-prefixes" then (."private-prefixes"[-1:][0] | fallbackString) else null end),
+					"primary-domain",
 			}
 		)
 	};
@@ -126,7 +126,7 @@ def distinctMangleDomain(domain):
 	domain as $domain
 	| .value |= setKeyCounterObjectCount($domain.value | fallbackString; 1)
 	| ."public-suffixes" |= setArrayToKeyCounterObject(($domain."public-suffixes" // []) | map(.idn | fallbackString); 1)
-	| ."primary-domain" |= setKeyCounterObjectCount(($domain."private-prefixes" // []) | .[-1:][0] | fallbackString; 1);
+	| ."primary-domain" |= setKeyCounterObjectCount($domain."primary-domain" | fallbackString; 1);
 
 def distinctMangleUrl(url):
 	. as $aggregatedUrl
@@ -166,6 +166,7 @@ def distinctMangle:
 				isSameDomain: (.[0].classification.isSameDomain // false),
 				isSubdomain: (.[0].classification.isSubdomain // false),
 				isSuperdomain: (.[0].classification.isSuperdomain // false),
+				isSamePrimaryDomain: (.[0].classification.isSamePrimaryDomain // false),
 				isInternalDomain: (.[0].classification.isInternalDomain // false),
 				isExternalDomain: (.[0].classification.isExternalDomain // false),
 				isSuccessful: (.[0].classification.isSuccessful // false),
@@ -196,6 +197,7 @@ def distinctMangle:
 		.classification.isSameDomain = (.classification.isSameDomain and $request.classification.isSameDomain)
 		| .classification.isSubdomain = (.classification.isSubdomain and $request.classification.isSubdomain)
 		| .classification.isSuperdomain = (.classification.isSuperdomain and $request.classification.isSuperdomain)
+		| .classification.isSamePrimaryDomain = (.classification.isSamePrimaryDomain and $request.classification.isSamePrimaryDomain)
 		| .classification.isInternalDomain = (.classification.isInternalDomain and $request.classification.isInternalDomain)
 		| .classification.isExternalDomain = (.classification.isExternalDomain and $request.classification.isExternalDomain)
 		| .classification.isSuccessful = (.classification.isSuccessful and $request.classification.isSuccessful)

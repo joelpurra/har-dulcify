@@ -10,6 +10,7 @@ read -d '' getNonFailedClassificationDomainScope <<-'EOF' || true
 	"is-same-domain": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-same-domain",
 	"is-subdomain": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-subdomain",
 	"is-superdomain": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-superdomain",
+	"is-same-primary-domain": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-same-primary-domain",
 	"is-internal-domain": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-internal-domain",
 	"is-external-domain": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-external-domain",
 }
@@ -23,6 +24,7 @@ read -d '' mapData <<-'EOF' || true
 	"is-same-domain",
 	"is-subdomain",
 	"is-superdomain",
+	"is-same-primary-domain",
 	"is-internal-domain",
 	"is-external-domain",
 	"is-mixed-domain": (1 - ."is-internal-domain" - ."is-external-domain"),
@@ -37,9 +39,10 @@ map(
 		"03--Same domain": ."is-same-domain",
 		"04--Subdomain": ."is-subdomain",
 		"05--Superdomain": ."is-superdomain",
-		"06--Internal domain": ."is-internal-domain",
-		"07--External domain": ."is-external-domain",
-		"08--Mixed": ."is-mixed-domain",
+		"06--Same primary": ."is-same-primary-domain",
+		"07--Internal domain": ."is-internal-domain",
+		"08--External domain": ."is-external-domain",
+		"09--Mixed": ."is-mixed-domain",
 	}
 )
 EOF

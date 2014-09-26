@@ -18,6 +18,10 @@ def isSuperdomain(domain):
 	| $domain
 	| isSubdomain($original);
 
+def isSamePrimaryDomain(originDomain):
+	originDomain as $originDomain
+	| ."primary-domain" == $originDomain."primary-domain";
+
 def isSecure:
 	. == "https";
 
@@ -28,12 +32,14 @@ def classifyUrl(origin):
 	| (if $hasDomainValue then (.domain.value | isSameDomain($origin.domain.value)) else false end) as $isSameDomain
 	| (if $hasDomainValue then (.domain.value | isSubdomain($origin.domain.value)) else false end) as $isSubdomain
 	| (if $hasDomainValue then (.domain.value | isSuperdomain($origin.domain.value)) else false end) as $isSuperdomain
-	| ($isSameDomain or $isSubdomain or $isSuperdomain) as $isInternalDomain
+	| (if $hasDomainValue then (.domain | isSamePrimaryDomain($origin.domain)) else false end) as $isSamePrimaryDomain
+	| ($isSameDomain or $isSubdomain or $isSuperdomain or $isSamePrimaryDomain) as $isInternalDomain
 	| (if (.scheme and .scheme.valid and .scheme.value) then (.scheme.value | isSecure) else false end) as $isSecure
 	| {
 		isSameDomain: $isSameDomain,
 		isSubdomain: $isSubdomain,
 		isSuperdomain: $isSuperdomain,
+		isSamePrimaryDomain: $isSamePrimaryDomain,
 		isInternalDomain: $isInternalDomain,
 		isExternalDomain: ($isInternalDomain | not),
 		isSecure: $isSecure,

@@ -174,6 +174,7 @@ select(
 	isSameDomain: 0,
 	isSubdomain: 0,
 	isSuperdomain: 0,
+	isSamePrimaryDomain: 0,
 	isInternalDomain: 0,
 	isExternalDomain: 0,
 	isSecure: 0,
@@ -183,6 +184,7 @@ select(
 | .counts.isSameDomain = redirectClassificationCount(.isSameDomain)
 | .counts.isSubdomain = redirectClassificationCount(.isSubdomain)
 | .counts.isSuperdomain = redirectClassificationCount(.isSuperdomain)
+| .counts.isSamePrimaryDomain = redirectClassificationCount(.isSamePrimaryDomain)
 | .counts.isInternalDomain = redirectClassificationCount(.isInternalDomain)
 | .counts.isExternalDomain = redirectClassificationCount(.isExternalDomain)
 | .counts.isSecure = redirectClassificationCount(.isSecure)
