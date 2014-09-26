@@ -111,7 +111,6 @@ def mangle(halfway):
 	| .blocks.disconnect.domains |= (if . then mergeKeyCounterObjects($halfway.blocks.disconnect.domains) else . end)
 	| .blocks.disconnect.organizations |= (if . then mergeKeyCounterObjects($halfway.blocks.disconnect.organizations) else . end)
 	| .blocks.disconnect.categories |= (if . then mergeKeyCounterObjects($halfway.blocks.disconnect.categories) else . end)
-	| .blocks.disconnect.raw |= (if . then mergeArrayToCounterArray($halfway.blocks.disconnect.raw) else . end)
 	| .count += $halfway.count
 	| .countDistinct += $halfway.countDistinct;
 

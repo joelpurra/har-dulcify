@@ -157,7 +157,6 @@ def base:
 				domains: {},
 				organizations: {},
 				categories: {},
-				raw: []
 			}
 		},
 		count: 0
@@ -193,7 +192,6 @@ def mangleDisconnect(disconnect):
 		.domains |= addArrayToKeyCounterObject($disconnect | map(.domain))
 		| .organizations |= addArrayToKeyCounterObject($disconnect | map(.organizations))
 		| .categories |= addArrayToKeyCounterObject($disconnect | map(.categories))
-		| .raw |= addToCounterArray($disconnect)
 	 else
 		.
 	end;
@@ -261,7 +259,6 @@ def distinctBase:
 				domains: {},
 				organizations: {},
 				categories: {},
-				raw: []
 			}
 		},
 		count: 0
@@ -296,7 +293,6 @@ def distinctMangleDisconnect(disconnect):
 		.domains |= mergeKeyCounterObjects($disconnect.domains)
 		| .organizations |= mergeKeyCounterObjects($disconnect.organizations)
 		| .categories |= mergeKeyCounterObjects($disconnect.categories)
-		| .raw |= mergeArrayToCounterArray($disconnect.raw)
 	 else
 		.
 	end;

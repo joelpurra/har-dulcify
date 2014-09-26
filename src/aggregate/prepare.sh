@@ -139,7 +139,6 @@ def distinctMangleDisconnect(disconnect):
 		.domains |= setArrayToKeyCounterObject($disconnect | map(.domain); 1)
 		| .organizations |= setArrayToKeyCounterObject($disconnect | map(.organizations); 1)
 		| .categories |= setArrayToKeyCounterObject($disconnect | map(.categories); 1)
-		| .raw |= setCounterArray($disconnect; 1)
 	 else
 		.
 	end;
@@ -189,7 +188,6 @@ def distinctMangle:
 					domains: {},
 					organizations: {},
 					categories: {},
-					raw: []
 				}
 			},
 			count: 0
@@ -217,7 +215,7 @@ def distinctMangle:
 		deleteEmptyObjectKey("domains")
 		| deleteEmptyObjectKey("organizations")
 		| deleteEmptyObjectKey("categories")
-		| deleteEmptyArrayKey("raw"))
+	)
 	| .blocks |= deleteEmptyObjectKey("disconnect")
 	| deleteEmptyObjectKey("blocks");
 
