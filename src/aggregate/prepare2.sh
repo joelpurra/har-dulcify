@@ -151,7 +151,6 @@ def base:
 			groups: {}
 		},
 		url: baseUrl,
-		referer: baseUrl,
 		blocks: {
 			disconnect: {
 				domains: {},
@@ -216,7 +215,6 @@ def mangle(request):
 	| ."mime-type" |= mangleMimeType($request."mime-type")
 	| .status |= mangleStatus($request.status)
 	| .url |= mangleUrl($request.url | fallbackString)
-	| .referer |= (if $request.referer then mangleUrl($request.referer) else . end)
 	| mangleBlocks($request)
 	| .count += 1;
 
@@ -253,7 +251,6 @@ def distinctBase:
 			groups: {}
 		},
 		url: distinctBaseUrl,
-		referer: distinctBaseUrl,
 		blocks: {
 			disconnect: {
 				domains: {},
@@ -322,7 +319,6 @@ def distinctMangle(request):
 		| ."mime-type" |= distinctMangleMimeType($request."mime-type")
 		| .status |= distinctMangleStatus($request.status)
 		| .url |= distinctMangleUrl($request.url)
-		| .referer |= (if $request.referer then distinctMangleUrl($request.referer) else . end)
 		| distinctMangleBlocks($request)
 	else
 		.

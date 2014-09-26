@@ -65,7 +65,6 @@ def mangle:
 
 .origin.url |= mangle
 | .requestedUrls[].url |= mangle
-| .requestedUrls[].referer |= mangle
 EOF
 
 cat | jq "$addPublicSuffixes" --argfile "publicSuffixLookup" "$preparedPublicSuffixFile"

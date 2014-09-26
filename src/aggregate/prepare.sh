@@ -113,13 +113,11 @@ def mangle:
 		"mime-type": mangleMimeType,
 		status,
 		url: (.url | mangleUrl),
-		referer: (if .referer then (.referer | mangleUrl) else null end),
 		blocks: {
 			disconnect: .blocks.disconnect
 		}
 		| deleteNullKey("disconnect")
 	}
-	| deleteNullKey("referer")
 	| deleteNullKey("blocks");
 
 def distinctMangleDomain(domain):
@@ -206,8 +204,6 @@ def distinctMangle:
 		| ."mime-type" |= distinctMangleMimeType($request."mime-type")
 		| .status |= distinctMangleStatus($request.status)
 		| .url |= distinctMangleUrl($request.url)
-		| .referer |= (if $request.referer then distinctMangleUrl($request.referer) else . end)
-		| deleteNullKey("referer")
 		| distinctMangleBlocks($request)
 		| .count += 1
 	)

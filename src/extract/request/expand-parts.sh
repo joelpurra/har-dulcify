@@ -570,7 +570,6 @@ def mangle:
 		url: $urlParts,
 		status: (.status | expandStatus),
 		"mime-type": (if ."mime-type" then (."mime-type" | splitMime) else null end),
-		referer: (if .referer then (.referer | splitUrlToComponents) else null end),
 		redirect: (if .redirect then (.redirect | splitUrlToComponents) else null end)
 	}
 	| deleteNullKeys;

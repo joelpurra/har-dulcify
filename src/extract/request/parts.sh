@@ -18,7 +18,6 @@ def getEntryDetails:
 		url: .request.url,
 		status: .response.status,
 		"mime-type": .response.content.mimeType,
-		referer: (if .request.headers then (.request.headers | httpHeader("Referer")) else null end),
 		redirect: (
 			if (.response.redirectURL | length) == 0 then
 				null
