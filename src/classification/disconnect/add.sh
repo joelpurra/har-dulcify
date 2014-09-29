@@ -32,6 +32,14 @@ def deleteEmptyArrayKey(key):
 		)
 	);
 
+def singleOrFirst:
+	if type == "array" then
+		sort
+		| .[0]
+	else
+		.
+	end;
+
 def matchDisconnect:
 	# Match the domain to disconnect's list.
 	# If the domain is a subdomain of a domain in disconnect's list, include it too.
@@ -51,7 +59,13 @@ def matchDisconnect:
 		end
 	)
 	# In case a subdomain matches more than once, keep only one of each match.
-	| unique;
+	| unique
+	# Fix multiple urls and organizations by picking the first one.
+	# Should not be a problem when disconnect fixes their datafile, but fixing here rather than in the preparation to retain blocking list aggregate analysis warning signs.
+	| map(
+		.urls |= singleOrFirst
+		| .organizations |= singleOrFirst
+	);
 
 def mangle:
 	if .url and .url.domain and .url.domain.components then
