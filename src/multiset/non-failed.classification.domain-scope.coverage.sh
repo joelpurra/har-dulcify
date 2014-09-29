@@ -40,8 +40,8 @@ map(
 		"04--Subdomain": ."is-subdomain",
 		"05--Superdomain": ."is-superdomain",
 		"06--Same primary": ."is-same-primary-domain",
-		"07--Internal domain": ."is-internal-domain",
-		"08--External domain": ."is-external-domain",
+		"07--Internal": ."is-internal-domain",
+		"08--External": ."is-external-domain",
 		"09--Mixed": ."is-mixed-domain",
 	}
 )
