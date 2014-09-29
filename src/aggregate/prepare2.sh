@@ -275,6 +275,7 @@ def distinctMangleClassification(request):
 	request as $request
 	| .classification.isSameDomain += ($request.classification.isSameDomain | boolToInt)
 	| .classification.isSubdomain += ($request.classification.isSubdomain | boolToInt)
+	| .classification.isSuperdomain += ($request.classification.isSuperdomain | boolToInt)
 	| .classification.isSamePrimaryDomain += ($request.classification.isSamePrimaryDomain | boolToInt)
 	| .classification.isInternalDomain += ($request.classification.isInternalDomain | boolToInt)
 	| .classification.isExternalDomain += ($request.classification.isExternalDomain | boolToInt)
