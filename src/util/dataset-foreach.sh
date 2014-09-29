@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# Execute parallel commands per folder, collecting the output on stdout.
+# Execute commands per folder, collecting the output on stdout.
 #
 # USAGE
 # 	"$0" <folder(s)> -- <command(s)>
@@ -26,4 +26,4 @@ shift
 
 command="$@"
 
-parallel --group -N 1 cd "--" "{}" "&&" "$command" ::: "${folders[@]}"
+parallel --jobs 1 -N 1 cd "--" "{}" "&&" "$command" ::: "${folders[@]}"
