@@ -549,6 +549,13 @@ def mimeTypeGrouping:
 		"application/pdf": "document",
 
 		"application/x-shockwave-flash": "object",
+
+		"audio/mid": "audio",
+		"audio/midi": "audio",
+		"audio/mpeg": "audio",
+		"audio/wav": "audio",
+		"audio/x-aiff": "audio",
+		"audio/x-wav": "audio",
 	} as $typeLookup
 	| $typeLookup[.];
 
