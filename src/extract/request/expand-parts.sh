@@ -556,6 +556,12 @@ def mimeTypeGrouping:
 		"audio/wav": "audio",
 		"audio/x-aiff": "audio",
 		"audio/x-wav": "audio",
+
+		"video/mp4": "video",
+		"video/ogg": "video",
+		"video/quicktime": "video",
+		"video/webm": "video",
+		"video/x-flv": "video",
 	} as $typeLookup
 	| $typeLookup[.];
 
