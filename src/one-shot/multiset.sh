@@ -4,6 +4,7 @@ set -e
 (( "$#" == 0 )) && { echo "Usage: "$(basename "$BASH_SOURCE")" <dataset folder path>[ <dataset folder path>[ <dataset folder path>]]" 1>&2; exit 1; }
 
 "${BASH_SOURCE%/*}/../multiset/download-retries.sh" "$@"
+"${BASH_SOURCE%/*}/../multiset/origin-redirects.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/request-status.codes.coverage.origin.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/non-failed.mime-types.groups.coverage.origin.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/non-failed.mime-types.groups.coverage.internal.sh" "$@"

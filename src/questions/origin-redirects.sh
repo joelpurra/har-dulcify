@@ -16,6 +16,15 @@ def over(n):
 def over1:
 	over(1);
 
+def boolToInt:
+	if . == true then
+		1
+	elif . == false then
+		0
+	else
+		null
+	end;
+
 def deepCoverage:
 	with_entries(
 		if (.value | type) == "number" then
@@ -96,19 +105,14 @@ def redirectClassificationCount(prop):
 def redirectClassificationCoverage(prop):
 	.originRedirectChain
 	| map(
-		select(
+		.classification
+		and (
 			.classification
-			and (
-				.classification
-				| (prop == true)
-			)
+			| (prop == true)
 		)
 	)
-	| if (length > 0) and all then
-		1
-	else
-		0
-	end;
+	| (length > 0) and all
+	| boolToInt;
 
 def addRedirectStuff(request):
 	request as $request
@@ -134,66 +138,82 @@ def addRedirectStuff(request):
 		.collect = false
 	end;
 
-select(
-	.origin
-	and
-	(.origin | requestHasRedirect)
-)
-| .origin as $origin
-| {
-	origin: (
-		$origin
-		| {
-			url,
-			classification
-		}
-	),
-	originRedirectChain: (
-		.requestedUrls
-		| reduce .[] as $request (
-			{
-				collect: true,
-				collected: [
-					{
-						redirect: $origin.redirect
-					}
-				],
-				previousRedirect: $origin.redirect.value
-			};
-			addRedirectStuff($request)
+def getFinalIsSecure:
+	.originRedirectChain
+	and (
+		.originRedirectChain
+		| length > 0
+		and (
+			.[-1:][0]
+			| (
+				.classification
+				and .classification.isSecure
+			)
 		)
-		| .collected
-	)
-}
-| .count = (.originRedirectChain | length)
+	);
 
-# TODO: avoid having to explicitly list these classification properties?
-| .counts = {
+(.origin and .origin.classification and .origin.classification.isFailed == false) as $isNonFailedDomain
+| if (.origin and (.origin | requestHasRedirect)) then
+	.origin as $origin
+	| {
+		origin: (
+			$origin
+			| {
+				url,
+				classification
+			}
+		),
+		originRedirectChain: (
+			.requestedUrls
+			| reduce .[] as $request (
+				{
+					collect: true,
+					collected: [
+						{
+							redirect: $origin.redirect
+						}
+					],
+					previousRedirect: $origin.redirect.value
+				};
+				addRedirectStuff($request)
+			)
+			| .collected
+		)
+	}
+	| .count = (.originRedirectChain | length)
+
+	# TODO: avoid having to explicitly list these classification properties?
+	| .counts.isSameDomain = redirectClassificationCount(.isSameDomain)
+	| .counts.isSubdomain = redirectClassificationCount(.isSubdomain)
+	| .counts.isSuperdomain = redirectClassificationCount(.isSuperdomain)
+	| .counts.isSamePrimaryDomain = redirectClassificationCount(.isSamePrimaryDomain)
+	| .counts.isInternalDomain = redirectClassificationCount(.isInternalDomain)
+	| .counts.isExternalDomain = redirectClassificationCount(.isExternalDomain)
+	| .counts.isSecure = redirectClassificationCount(.isSecure)
+	| .counts.isInsecure = redirectClassificationCount(.isInsecure)
 	# hasMissingClassification is a debugging counter, to check if any redirects didn't have a matching subsequent request.
-	hasMissingClassification: 0,
-	isSameDomain: 0,
-	isSubdomain: 0,
-	isSuperdomain: 0,
-	isSamePrimaryDomain: 0,
-	isInternalDomain: 0,
-	isExternalDomain: 0,
-	isSecure: 0,
-	isInsecure: 0,
-}
-| .counts.hasMissingClassification = (.originRedirectChain | map(select(has("classification") | not)) | length)
-| .counts.isSameDomain = redirectClassificationCount(.isSameDomain)
-| .counts.isSubdomain = redirectClassificationCount(.isSubdomain)
-| .counts.isSuperdomain = redirectClassificationCount(.isSuperdomain)
-| .counts.isSamePrimaryDomain = redirectClassificationCount(.isSamePrimaryDomain)
-| .counts.isInternalDomain = redirectClassificationCount(.isInternalDomain)
-| .counts.isExternalDomain = redirectClassificationCount(.isExternalDomain)
-| .counts.isSecure = redirectClassificationCount(.isSecure)
-| .counts.isInsecure = redirectClassificationCount(.isInsecure)
+	| .counts.hasMissingClassification = (.originRedirectChain | map(select(has("classification") | not)) | length)
 
-| .coverage = (.counts | deepCoverage)
-| .coverage.internalAndExternal += ((.coverage.isInternalDomain + .coverage.isExternalDomain) | over1)
+	| .coverage = (.counts | deepCoverage)
+	| .coverage.mixedInternalAndExternal = ((.coverage.isInternalDomain + .coverage.isExternalDomain) | over1)
+	| .coverage.mixedSecurity = ((.coverage.isSecure + .coverage.isInsecure) | over1)
+	| .coverage.finalIsSecure = (getFinalIsSecure | boolToInt)
 
-# TODO: add/fix so that there's an .all.isSecure, .all.isInsecure, .all.isSameDomain etcetera so it's clear that all redirects have the same property values.
+	| .all.isSameDomain = redirectClassificationCoverage(.isSameDomain)
+	| .all.isSubdomain = redirectClassificationCoverage(.isSubdomain)
+	| .all.isSuperdomain = redirectClassificationCoverage(.isSuperdomain)
+	| .all.isSamePrimaryDomain = redirectClassificationCoverage(.isSamePrimaryDomain)
+	| .all.isInternalDomain = redirectClassificationCoverage(.isInternalDomain)
+	| .all.isExternalDomain = redirectClassificationCoverage(.isExternalDomain)
+	| .all.isSecure = redirectClassificationCoverage(.isSecure)
+	| .all.isInsecure = redirectClassificationCoverage(.isInsecure)
+	| .all.hasMissingClassification = ((.counts.hasMissingClassification == .count) | boolToInt)
+else
+	{
+		count: 0
+	}
+end
+| .isNonFailedDomain = $isNonFailedDomain
 EOF
 
 cat | jq "$getOriginWithRedirects"
