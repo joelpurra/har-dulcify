@@ -57,6 +57,28 @@ def augmentWithCount:
 		values: .
 	};
 
+def mergeArrayOfObjectsToObjectWithDuplicatesAsArray:
+	reduce .[] as $obj (
+		{};
+		. as $big
+		| $obj
+		| to_entries
+		| .[]
+		| .key as $key
+		| .value as $value
+		| $big
+		| if $big | has($key) then
+			$big[$key] += [ $value ]
+		else
+			$big[$key] = [ $value ]
+		end
+	);
+
+def hasValue(value):
+	value as $value
+	| index($value)
+	| type == "number";
+
 def breakOutArrays:
 	{
 		# Flattening necessary since some entries have multiple categories/organizations/urls.
@@ -133,7 +155,7 @@ def getOrganizationsByCategoryCount:
 		)
 	);
 
-def getOrganizationsWithTheMostCategories:
+def getOrganizationsWithTheMostCategoriesCounts:
 	getOrganizationsByCategoryCount
 	| map(
 		map(
@@ -149,6 +171,39 @@ def getOrganizationsWithTheMostCategories:
 	| keyCounterObjectMinimumTwo
 	| keyCounterObjectSortByValueDesc
 	| augmentWithCount;
+
+def getOrganizationsWithTheMostCategoriesNames:
+	getOrganizationsByCategoryCount
+	| map(
+		map(
+			# Skip organizations with duplicates
+			select(
+				(.organizations | type) == "string"
+			)
+			| {
+				(.organizations): .categories
+			}
+		)
+		| .[]
+	)
+	| mergeArrayOfObjectsToObjectWithDuplicatesAsArray
+	| with_entries(
+		.value |= {
+			categories: {
+				Advertising: hasValue("Advertising"),
+				Analytics: hasValue("Analytics"),
+				Content: hasValue("Content"),
+				Disconnect: hasValue("Disconnect"),
+				Social: hasValue("Social"),
+			},
+			count: length,
+		}
+	)
+	| to_entries
+	| map(select(.value.count > 1))
+	| sort_by(.value.count)
+	| reverse
+	| from_entries;
 
 def getOrganizationCountByCategoryCount:
 	getOrganizationsByCategoryCount
@@ -187,7 +242,8 @@ def getOrganizationCountByCategoryCount:
 }
 | . + {
 	"organizations-per-category": {
-		"more-than-one": ($root | getOrganizationsWithTheMostCategories),
+		"more-than-one": ($root | getOrganizationsWithTheMostCategoriesCounts),
+		"more-than-one-names": ($root | getOrganizationsWithTheMostCategoriesNames),
 		"count": ($root | getOrganizationCountByCategoryCount)
 	}
 }
