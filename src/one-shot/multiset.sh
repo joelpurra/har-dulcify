@@ -5,6 +5,7 @@ set -e
 
 "${BASH_SOURCE%/*}/../multiset/download-retries.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/origin-redirects.sh" "$@"
+"${BASH_SOURCE%/*}/../multiset/ratio-buckets.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/request-status.codes.coverage.origin.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/non-failed.mime-types.groups.coverage.origin.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/non-failed.mime-types.groups.coverage.internal.sh" "$@"
