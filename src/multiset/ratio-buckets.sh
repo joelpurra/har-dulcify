@@ -112,4 +112,4 @@ splitIntoFilesPerBucket() {
 
 "${BASH_SOURCE%/*}/../util/dataset-query.sh" "$@" -- test -e "$ratioBucketsAggregateJson" '&&' cat "$ratioBucketsAggregateJson" '|' jq --arg path '"$PWD"' "'$getOriginRedirectAggregates'" >"datasets.non-failed.ratio-buckets.normalized.cumulative.json"
 
-splitIntoFilesPerBucket "is-secure"
+splitIntoFilesPerBucket "is-secure" "is-internal-domain"
