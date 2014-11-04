@@ -20,6 +20,7 @@ read -d '' mapData <<-'EOF' || true
 	"cloudfront.net": (.domains."cloudfront.net" // 0),
 	"addthis.com": (.domains."addthis.com" // 0),
 	"newrelic.com": (.domains."newrelic.com" // 0),
+	"optimizely.com": (.domains."optimizely.com" // 0),
 	"scorecardresearch.com": (.domains."scorecardresearch.com" // 0),
 	# "xxxxxxxxxxxxxxxxxxxxxxxxx": (.domains."xxxxxxxxxxxxxxxxxxxxxxxxx" // 0),
 }
@@ -35,7 +36,8 @@ map(
 		"05--cloudfront.net": ."cloudfront.net",
 		"06--addthis.com": ."addthis.com",
 		"07--newrelic.com": ."newrelic.com",
-		"08--scorecardresearch.com": ."scorecardresearch.com",
+		"08--optimizely.com": ."optimizely.com",
+		"09--scorecardresearch.com": ."scorecardresearch.com",
 		# "0c--yyyyyyyyyyyyyyyy": ."yyyyyyyyyyyyyyyy",
 	}
 )

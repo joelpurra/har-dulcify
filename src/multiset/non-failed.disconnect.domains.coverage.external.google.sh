@@ -21,6 +21,7 @@ read -d '' mapData <<-'EOF' || true
 	"googleapis.com": (.domains."googleapis.com" // 0),
 	"maps.google.com": (.domains."maps.google.com" // 0),
 	"youtube.com": (.domains."youtube.com" // 0),
+	"google.se": (.domains."google.se" // 0),
 	# "xxxxxxxxxxxxxxxxxxxxxxxxx": (.domains."xxxxxxxxxxxxxxxxxxxxxxxxx" // 0),
 }
 EOF
@@ -36,6 +37,7 @@ map(
 		"06--googleapis.com": ."googleapis.com",
 		"07--maps.google.com": ."maps.google.com",
 		"08--youtube.com": ."youtube.com",
+		"09--google.se": ."google.se",
 		# "0c--yyyyyyyyyyyyyyyy": ."yyyyyyyyyyyyyyyy",
 	}
 )
