@@ -11,20 +11,6 @@ def keyCounterObjectMinimum(n):
 def keyCounterObjectMinimumTwo:
 	keyCounterObjectMinimum(2);
 
-def keyCounterObjectTop(n):
-	n as $n
-	| to_entries
-	| sort_by(.value)
-	| reverse
-	| .[0:$n]
-	| from_entries;
-
-def keyCounterObjectTopTen:
-	keyCounterObjectTop(10);
-
-def keyCounterObjectTopOneHundred:
-	keyCounterObjectTop(100);
-
 def keyCounterObjectSortByKeyAsc:
 	to_entries
 	| sort_by(.key)
@@ -59,19 +45,27 @@ def nullFallback(fallback):
 def nullFalllbackEmptyObject:
 	nullFallback({});
 
+def keyCounterObjectSortByValueDescOrEmptyObject:
+	keyCounterObjectSortByValueDesc
+	| nullFalllbackEmptyObject;
+
+def keyCounterObjectMinimumTwoOrEmptyObject:
+	keyCounterObjectMinimumTwo
+	| nullFalllbackEmptyObject;
+
 def mangleUrl:
 	{
-		domains: .domain.value | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
-		"public-suffixes": .domain."public-suffixes" | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
-		"primary-domain": .domain."primary-domain" | keyCounterObjectTopOneHundred | keyCounterObjectMinimumTwo | nullFalllbackEmptyObject | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject,
+		domains: .domain.value | keyCounterObjectSortByValueDescOrEmptyObject,
+		"public-suffixes": .domain."public-suffixes" | keyCounterObjectSortByValueDescOrEmptyObject,
+		"primary-domain": .domain."primary-domain" | keyCounterObjectSortByValueDescOrEmptyObject,
 	};
 
 def mangleBlocks:
 	{
 		disconnect: (.blocks.disconnect | {
-					domains: .domains | keyCounterObjectTopOneHundred | nullFalllbackEmptyObject,
-					organizations: .organizations | keyCounterObjectTopOneHundred | nullFalllbackEmptyObject,
-					categories: .categories | keyCounterObjectTopOneHundred | nullFalllbackEmptyObject,
+					domains: .domains | keyCounterObjectSortByValueDescOrEmptyObject,
+					organizations: .organizations | keyCounterObjectSortByValueDescOrEmptyObject,
+					categories: .categories | keyCounterObjectSortByValueDescOrEmptyObject,
 				})
 	};
 
@@ -79,11 +73,10 @@ def coverageKeyCounterObject(countDistinct):
 	countDistinct as $countDistinct
 	| unlessNullFallback(
 		operateOnValues(
-			. / $countDistinct)
-			| unlessNullFallback(
-				keyCounterObjectSortByValueDesc;
-				{}
-		);
+			. / $countDistinct
+		)
+		| nullFalllbackEmptyObject
+		| keyCounterObjectSortByValueDescOrEmptyObject;
 		{}
 	);
 
@@ -119,12 +112,12 @@ def mangleShared:
 	{
 		counts: {
 			"kinds-resource": {
-				types: (."mime-type".types | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject),
-				groups: (."mime-type".groups | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject)
+				types: (."mime-type".types | keyCounterObjectSortByValueDescOrEmptyObject),
+				groups: (."mime-type".groups | keyCounterObjectSortByValueDescOrEmptyObject)
 			},
 			"request-status": {
-				codes: (.status.codes | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject),
-				groups: (.status.groups | keyCounterObjectTopOneHundred | keyCounterObjectSortByValueDesc | nullFalllbackEmptyObject)
+				codes: (.status.codes | keyCounterObjectSortByValueDescOrEmptyObject),
+				groups: (.status.groups | keyCounterObjectSortByValueDescOrEmptyObject)
 			},
 			classification: {
 				"is-same-domain": .classification.isSameDomain,
@@ -144,14 +137,16 @@ def mangleShared:
 			count,
 			countDistinct
 		}
-	}
-	| .coverage = (.counts | coverage);
+	};
+
+def mangleSharedAddCoverage:
+	.coverage = (.counts | coverage);
 
 def mangleUrlGroup:
 	if . then
 		{
-			requestedUrls: (.requestedUrls | mangleShared),
-			requestedUrlsDistinct: (.requestedUrlsDistinct | mangleShared),
+			requestedUrls: (.requestedUrls | mangleShared | mangleSharedAddCoverage),
+			requestedUrlsDistinct: (.requestedUrlsDistinct | mangleShared | mangleSharedAddCoverage),
 		}
 	else
 		null
@@ -160,7 +155,16 @@ def mangleUrlGroup:
 def mangleGroup:
 	if . then
 		{
-			origin: (.origin | mangleShared),
+			origin: (
+				.origin
+				| mangleShared
+				# Don't keep full lists of input domains.
+				| .counts.urls |= (
+					.domains |= (keyCounterObjectMinimumTwoOrEmptyObject | keyCounterObjectSortByValueDescOrEmptyObject)
+					| ."primary-domain" |= (keyCounterObjectMinimumTwoOrEmptyObject | keyCounterObjectSortByValueDescOrEmptyObject)
+				)
+				| mangleSharedAddCoverage
+			),
 			unfilteredUrls: (.unfilteredUrls | mangleUrlGroup),
 			internalUrls: (.internalUrls | mangleUrlGroup),
 			externalUrls: (.externalUrls | mangleUrlGroup),
