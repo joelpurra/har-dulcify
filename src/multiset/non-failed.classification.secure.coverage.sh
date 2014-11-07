@@ -37,15 +37,15 @@ map(
 	{
 		"01--Dataset": .dataset,
 		"02--Domains": ."non-failed-domains",
-		"03--All sec": ."all-secure-coverage",
-		"04--All insec": ."all-insecure-coverage",
+		"03--Int insec": ."internal-insecure-coverage",
+		"04--Mix int sec": ."internal-mixed-coverage",
 		"05--Int sec": ."internal-secure-coverage",
-		"06--Int insec": ."internal-insecure-coverage",
-		"07--Ext sec": ."external-secure-coverage",
-		"08--Ext insec": ."external-insecure-coverage",
-		"09--Mix sec": ."all-mixed-coverage",
-		"10--Mix int sec": ."internal-mixed-coverage",
-		"11--Mix ext sec": ."external-mixed-coverage",
+		"06--Ext insec": ."external-insecure-coverage",
+		"07--Mix ext sec": ."external-mixed-coverage",
+		"08--Ext sec": ."external-secure-coverage",
+		"09--All insec": ."all-insecure-coverage",
+		"10--Mix sec": ."all-mixed-coverage",
+		"11--All sec": ."all-secure-coverage",
 	}
 )
 EOF

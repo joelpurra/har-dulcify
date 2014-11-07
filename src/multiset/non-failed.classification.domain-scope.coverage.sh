@@ -41,8 +41,8 @@ map(
 		"05--Superdomain": ."is-superdomain",
 		"06--Same primary": ."is-same-primary-domain",
 		"07--Internal": ."is-internal-domain",
-		"08--External": ."is-external-domain",
-		"09--Mixed": ."is-mixed-domain",
+		"08--Mixed": ."is-mixed-domain",
+		"09--External": ."is-external-domain",
 	}
 )
 EOF
