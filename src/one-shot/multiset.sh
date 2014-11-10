@@ -18,3 +18,4 @@ set -e
 "${BASH_SOURCE%/*}/../multiset/non-failed.disconnect.domains.coverage.external.google.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/non-failed.disconnect.organizations.coverage.external.sh" "$@"
 "${BASH_SOURCE%/*}/../multiset/non-failed.requests.counts.sh" "$@"
+"${BASH_SOURCE%/*}/../multiset/non-failed.disconnect.counts.sh" "$@"
