@@ -140,24 +140,17 @@ reduce .[] as $item (
 		nonFailedDomainCount: 0,
 		requestCount: 0,
 		ratios: ratioBucketsBase,
-		# all: ratioBucketsBase,
-		# coverage: ratioBucketsBase,
 	};
 	.domainCount += 1
 	| .nonFailedDomainCount += ($item.isNonFailedDomain | boolToInt)
 	| if ($item.requestCount > 0) then
 		.requestCount += $item.requestCount
 		| .ratios |= deepAddToRatioBuckets($item.counts; $item.requestCount)
-		# | .coverage |= deepAddToRatioBuckets($item.coverage)
-		# | .all |= deepAddToRatioBuckets($item.all)
 	else
 		.
 	end
 )
-# | . as $aggregated
 | .ratios |= deepAddRatioBucketVariations
-# | .coverage |= deepAddRatioBucketVariations
-# | .all |= deepAddRatioBucketVariations
 EOF
 
 jq --slurp "$getRatioBucketAggregates"
