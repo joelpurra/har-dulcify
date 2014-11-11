@@ -20,9 +20,9 @@ read -d '' getOriginRedirectAggregates <<-'EOF' || true
 	"is-secure": .ratios.isSecure.normalized.cumulative,
 
 	"is-disconnect": .ratios.isDisconnect.normalized.cumulative,
-	"disconnect-domains": .occurances.disonnectDomains.values.values,
-	"disconnect-organizations": .occurances.disonnectOrganizations.values.values,
-	"disconnect-categories": .occurances.disonnectCategories.values.values,
+	"disconnect-domains": .occurrences.disonnectDomains.values.values,
+	"disconnect-organizations": .occurrences.disonnectOrganizations.values.values,
+	"disconnect-categories": .occurrences.disonnectCategories.values.values,
 }
 EOF
 
@@ -69,7 +69,7 @@ def useRatioStringfNecessary:
 		tonumber
 		| (. / 100)
 		| padToTwoDecimals
-	elif $bucketType == "occurances" then
+	elif $bucketType == "occurrences" then
 		# Because it is used for a log axis, the x value "0" can't be used - replace with "0.1".
 		if . == 0 then
 			0.1
@@ -139,4 +139,4 @@ splitIntoFilesPerBucket() {
 "${BASH_SOURCE%/*}/../util/dataset-query.sh" "$@" -- test -e "$ratioBucketsAggregateJson" '&&' cat "$ratioBucketsAggregateJson" '|' jq --arg path '"$PWD"' "'$getOriginRedirectAggregates'" >"datasets.non-failed.ratio-buckets.normalized.cumulative.json"
 
 splitIntoFilesPerBucket "ratio" "is-secure" "is-internal-domain"
-splitIntoFilesPerBucket "occurances" "disconnect-organizations"
+splitIntoFilesPerBucket "occurrences" "disconnect-organizations"

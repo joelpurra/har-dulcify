@@ -137,7 +137,7 @@ def ratioBucketsBase:
 		isDisconnect: ratioBucket,
 	};
 
-def occurancesBucketsBase:
+def occurrencesBucketsBase:
 	{
 		# Use 101 to get [0,99] and "above 99".
 		disonnectDomains: maxBucket(101),
@@ -171,20 +171,20 @@ reduce .[] as $item (
 		nonFailedDomainCount: 0,
 		requestCount: 0,
 		ratios: ratioBucketsBase,
-		occurances: occurancesBucketsBase,
+		occurrences: occurrencesBucketsBase,
 	};
 	.domainCount += 1
 	| .nonFailedDomainCount += ($item.isNonFailedDomain | boolToInt)
 	| if ($item.requestCount > 0) then
 		.requestCount += $item.requestCount
 		| .ratios |= deepAddToRatioBuckets($item.counts; $item.requestCount)
-		| .occurances |= deepMaxBucketIncrement($item.uniqueCounts)
+		| .occurrences |= deepMaxBucketIncrement($item.uniqueCounts)
 	else
 		.
 	end
 )
 | .ratios |= deepAddBucketVariations
-| .occurances |= deepAddBucketVariations
+| .occurrences |= deepAddBucketVariations
 EOF
 
 jq --slurp "$getRatioBucketAggregates"
