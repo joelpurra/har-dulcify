@@ -18,6 +18,11 @@ read -d '' getOriginRedirectAggregates <<-'EOF' || true
 	"is-external-domain": .ratios.isExternalDomain.normalized.cumulative,
 	"is-insecure": .ratios.isInsecure.normalized.cumulative,
 	"is-secure": .ratios.isSecure.normalized.cumulative,
+
+	"is-disconnect": .ratios.isDisconnect.normalized.cumulative,
+	"disconnect-domains": .occurances.disonnectDomains.values.values,
+	"disconnect-organizations": .occurances.disonnectOrganizations.values.values,
+	"disconnect-categories": .occurances.disonnectCategories.values.values,
 }
 EOF
 
@@ -59,11 +64,28 @@ def padToTwoDecimals:
 	)
 	| join(".");
 
+def useRatioStringfNecessary:
+	if $bucketType == "ratio" then
+		tonumber
+		| (. / 100)
+		| padToTwoDecimals
+	elif $bucketType == "occurances" then
+		# Because it is used for a log axis, the x value "0" can't be used - replace with "0.1".
+		if . == 0 then
+			0.1
+		else
+			.
+		end
+		| tostring
+	else
+		"Unexpected bucket type"
+	end;
+
 def getColumnName(columnNumber; bucketIndex):
 	columnNumber as $columnNumber
 	| bucketIndex as $bucketIndex
 	| ($columnNumber | padToThreeDigits) as $prefix
-	| ($bucketIndex | tonumber | (. / 100) | padToTwoDecimals) as $suffix
+	| ($bucketIndex | useRatioStringfNecessary) as $suffix
 	| ($prefix + "--" + $suffix);
 
 map(
@@ -93,23 +115,28 @@ sort_by(.dataset)
 EOF
 
 splitIntoFilePerBucket() {
-	local bucketName="$1"
+	local bucketType="$1"
+	local bucketName="$2"
 
 	<"datasets.non-failed.ratio-buckets.normalized.cumulative.json" jq --arg "bucketName" "$bucketName" "$selectBucket" >"datasets.non-failed.ratio-buckets.$bucketName.normalized.cumulative.json"
 
 	<"datasets.non-failed.ratio-buckets.$bucketName.normalized.cumulative.json" jq "$mapData" | "${BASH_SOURCE%/*}/../util/to-array.sh" | jq "$sortObjects" >"datasets.non-failed.ratio-buckets.$bucketName.normalized.cumulative.sorted.json"
 
-	<"datasets.non-failed.ratio-buckets.$bucketName.normalized.cumulative.sorted.json" jq "$renameForTsvColumnOrdering" | "${BASH_SOURCE%/*}/../util/array-of-objects-to-tsv.sh" | "${BASH_SOURCE%/*}/../util/clean-tsv-sorted-header.sh" >"datasets.non-failed.ratio-buckets.$bucketName.normalized.cumulative.sorted.tsv"
+	<"datasets.non-failed.ratio-buckets.$bucketName.normalized.cumulative.sorted.json" jq --arg "bucketType" "$bucketType" "$renameForTsvColumnOrdering" | "${BASH_SOURCE%/*}/../util/array-of-objects-to-tsv.sh" | "${BASH_SOURCE%/*}/../util/clean-tsv-sorted-header.sh" >"datasets.non-failed.ratio-buckets.$bucketName.normalized.cumulative.sorted.tsv"
 
 }
 
 splitIntoFilesPerBucket() {
+	local bucketType="$1"
+	shift
+
 	for bucketName in "$@";
 	do
-		splitIntoFilePerBucket "$bucketName"
+		splitIntoFilePerBucket "$bucketType" "$bucketName"
 	done
 }
 
 "${BASH_SOURCE%/*}/../util/dataset-query.sh" "$@" -- test -e "$ratioBucketsAggregateJson" '&&' cat "$ratioBucketsAggregateJson" '|' jq --arg path '"$PWD"' "'$getOriginRedirectAggregates'" >"datasets.non-failed.ratio-buckets.normalized.cumulative.json"
 
-splitIntoFilesPerBucket "is-secure" "is-internal-domain"
+splitIntoFilesPerBucket "ratio" "is-secure" "is-internal-domain"
+splitIntoFilesPerBucket "occurances" "disconnect-organizations"

@@ -102,6 +102,26 @@ def deepAddToRatioBuckets(item; denominator):
 		end
 	);
 
+def maxBucket(highestCounter):
+	highestCounter as $highestCounter
+	| counterBucket($highestCounter);
+
+def maxBucketIncrement(count):
+	count as $count
+	| ([$count, (length - 1)] | min) as $index
+	| counterBucketIncrement($index);
+
+def deepMaxBucketIncrement(item):
+	item as $item
+	| with_entries(
+		($item[.key]) as $other
+		| if (.value | type) == "array" and ($other | type) == "number" then
+			.value |= maxBucketIncrement($other)
+		else
+			.value |= deepMaxBucketIncrement($other)
+		end
+	);
+
 # TODO: avoid having to explicitly list these classification properties?
 def ratioBucketsBase:
 	{
@@ -113,25 +133,36 @@ def ratioBucketsBase:
 		isExternalDomain: ratioBucket,
 		isSecure: ratioBucket,
 		isInsecure: ratioBucket,
+
+		isDisconnect: ratioBucket,
 	};
 
-def addRatioBucketCumulative:
+def occurancesBucketsBase:
+	{
+		# Use 101 to get [0,99] and "above 99".
+		disonnectDomains: maxBucket(101),
+		disonnectOrganizations: maxBucket(101),
+		# Only 5 categories, so 7 buckets 0, 1-5, 5+ (just in case).
+		disonnectCategories: maxBucket(7),
+	};
+
+def addBucketCumulative:
 	{
 		values: .,
 		cumulative: cumulativeCounterBucket,
 	};
 
-def addRatioBucketVariations:
+def addBucketVariations:
 	{
 		values: .,
 		normalized: normalizedCounterBucket,
 	}
-	| .values |= addRatioBucketCumulative
-	| .normalized |= addRatioBucketCumulative;
+	| .values |= addBucketCumulative
+	| .normalized |= addBucketCumulative;
 
-def deepAddRatioBucketVariations:
+def deepAddBucketVariations:
 	with_entries(
-		.value |= addRatioBucketVariations
+		.value |= addBucketVariations
 	);
 
 reduce .[] as $item (
@@ -140,17 +171,20 @@ reduce .[] as $item (
 		nonFailedDomainCount: 0,
 		requestCount: 0,
 		ratios: ratioBucketsBase,
+		occurances: occurancesBucketsBase,
 	};
 	.domainCount += 1
 	| .nonFailedDomainCount += ($item.isNonFailedDomain | boolToInt)
 	| if ($item.requestCount > 0) then
 		.requestCount += $item.requestCount
 		| .ratios |= deepAddToRatioBuckets($item.counts; $item.requestCount)
+		| .occurances |= deepMaxBucketIncrement($item.uniqueCounts)
 	else
 		.
 	end
 )
-| .ratios |= deepAddRatioBucketVariations
+| .ratios |= deepAddBucketVariations
+| .occurances |= deepAddBucketVariations
 EOF
 
 jq --slurp "$getRatioBucketAggregates"
