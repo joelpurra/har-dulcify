@@ -126,6 +126,7 @@ def mangleShared:
 				"is-same-primary-domain": .classification.isSamePrimaryDomain,
 				"is-internal-domain": .classification.isInternalDomain,
 				"is-external-domain": .classification.isExternalDomain,
+				"is-disconnect-match": .classification.isDisconnectMatch,
 				"is-successful-request": .classification.isSuccessful,
 				"is-unsuccessful-request": .classification.isUnsuccessful,
 				"is-failed-request": .classification.isFailed,

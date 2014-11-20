@@ -51,10 +51,9 @@ def requestDisconnectCount(prop):
 			isSamePrimaryDomain: requestClassificationCount(.isSamePrimaryDomain),
 			isInternalDomain: requestClassificationCount(.isInternalDomain),
 			isExternalDomain: requestClassificationCount(.isExternalDomain),
+			isDisconnectMatch: requestClassificationCount(.isDisconnectMatch),
 			isSecure: requestClassificationCount(.isSecure),
 			isInsecure: requestClassificationCount(.isInsecure),
-
-			isDisconnect: ($disconnectUrls | length),
 		},
 		uniqueCounts: {
 			disonnectDomains: ($disconnectUrlEntries | requestDisconnectCount(.domain)),

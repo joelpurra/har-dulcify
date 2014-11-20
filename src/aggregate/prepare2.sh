@@ -136,6 +136,7 @@ def base:
 			isSamePrimaryDomain: 0,
 			isInternalDomain: 0,
 			isExternalDomain: 0,
+			isDisconnectMatch: 0,
 			isSuccessful: 0,
 			isUnsuccessful: 0,
 			isFailed: 0,
@@ -179,6 +180,7 @@ def mangleClassification(request):
 	| .classification.isSamePrimaryDomain += ($request.classification.isSamePrimaryDomain | boolToInt)
 	| .classification.isInternalDomain += ($request.classification.isInternalDomain | boolToInt)
 	| .classification.isExternalDomain += ($request.classification.isExternalDomain | boolToInt)
+	| .classification.isDisconnectMatch += ($request.classification.isDisconnectMatch | boolToInt)
 	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)
 	| .classification.isUnsuccessful += ($request.classification.isUnsuccessful | boolToInt)
 	| .classification.isFailed += ($request.classification.isFailed | boolToInt)
@@ -236,6 +238,7 @@ def distinctBase:
 			isSamePrimaryDomain: 0,
 			isInternalDomain: 0,
 			isExternalDomain: 0,
+			isDisconnectMatch: 0,
 			isSuccessful: 0,
 			isUnsuccessful: 0,
 			isFailed: 0,
@@ -279,6 +282,7 @@ def distinctMangleClassification(request):
 	| .classification.isSamePrimaryDomain += ($request.classification.isSamePrimaryDomain | boolToInt)
 	| .classification.isInternalDomain += ($request.classification.isInternalDomain | boolToInt)
 	| .classification.isExternalDomain += ($request.classification.isExternalDomain | boolToInt)
+	| .classification.isDisconnectMatch += ($request.classification.isDisconnectMatch | boolToInt)
 	| .classification.isSuccessful += ($request.classification.isSuccessful | boolToInt)
 	| .classification.isUnsuccessful += ($request.classification.isUnsuccessful | boolToInt)
 	| .classification.isFailed += ($request.classification.isFailed | boolToInt)

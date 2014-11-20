@@ -189,6 +189,7 @@ def getFinalIsSecure:
 	| .counts.isSamePrimaryDomain = redirectClassificationCount(.isSamePrimaryDomain)
 	| .counts.isInternalDomain = redirectClassificationCount(.isInternalDomain)
 	| .counts.isExternalDomain = redirectClassificationCount(.isExternalDomain)
+	| .counts.isDisconnectMatch = redirectClassificationCount(.isDisconnectMatch)
 	| .counts.isSecure = redirectClassificationCount(.isSecure)
 	| .counts.isInsecure = redirectClassificationCount(.isInsecure)
 	# hasMissingClassification is a debugging counter, to check if any redirects didn't have a matching subsequent request.
@@ -205,6 +206,7 @@ def getFinalIsSecure:
 	| .all.isSamePrimaryDomain = redirectClassificationCoverage(.isSamePrimaryDomain)
 	| .all.isInternalDomain = redirectClassificationCoverage(.isInternalDomain)
 	| .all.isExternalDomain = redirectClassificationCoverage(.isExternalDomain)
+	| .all.isDisconnectMatch = redirectClassificationCoverage(.isDisconnectMatch)
 	| .all.isSecure = redirectClassificationCoverage(.isSecure)
 	| .all.isInsecure = redirectClassificationCoverage(.isInsecure)
 	| .all.hasMissingClassification = ((.counts.hasMissingClassification == .count) | boolToInt)
