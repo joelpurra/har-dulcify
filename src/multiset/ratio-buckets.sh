@@ -20,9 +20,9 @@ read -d '' getOriginRedirectAggregates <<-'EOF' || true
 	"is-insecure": .ratios.isInsecure.normalized.cumulative,
 	"is-secure": .ratios.isSecure.normalized.cumulative,
 
-	"disconnect-domains": .occurrences.disonnectDomains.values.values,
-	"disconnect-organizations": .occurrences.disonnectOrganizations.values.values,
-	"disconnect-categories": .occurrences.disonnectCategories.values.values,
+	"disconnect-domains": .occurrences.disonnectDomains.normalized.cumulative,
+	"disconnect-organizations": .occurrences.disonnectOrganizations.normalized.cumulative,
+	"disconnect-categories": .occurrences.disonnectCategories.normalized.cumulative,
 }
 EOF
 
