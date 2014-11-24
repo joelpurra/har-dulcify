@@ -26,4 +26,4 @@ shift
 
 command="$@"
 
-parallel --jobs 1 -N 1 cd "--" "{}" "&&" "$command" ::: "${folders[@]}"
+parallel --jobs 1 --line-buffer -N 1 cd "--" "{}" "&&" "$command" ::: "${folders[@]}"
