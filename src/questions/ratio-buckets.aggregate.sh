@@ -132,6 +132,7 @@ def ratioBucketsBase:
 		isInternalDomain: ratioBucket,
 		isExternalDomain: ratioBucket,
 		isDisconnectMatch: ratioBucket,
+		isNotDisconnectMatch: ratioBucket,
 		isSecure: ratioBucket,
 		isInsecure: ratioBucket,
 	};

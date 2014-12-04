@@ -167,6 +167,7 @@ def distinctMangle:
 				isInternalDomain: (.[0].classification.isInternalDomain // false),
 				isExternalDomain: (.[0].classification.isExternalDomain // false),
 				isDisconnectMatch: (.[0].classification.isDisconnectMatch // false),
+				isNotDisconnectMatch: (.[0].classification.isNotDisconnectMatch // false),
 				isSuccessful: (.[0].classification.isSuccessful // false),
 				isUnsuccessful: (.[0].classification.isUnsuccessful // false),
 				isFailed: (.[0].classification.isFailed // false),
@@ -198,6 +199,7 @@ def distinctMangle:
 		| .classification.isInternalDomain = (.classification.isInternalDomain and $request.classification.isInternalDomain)
 		| .classification.isExternalDomain = (.classification.isExternalDomain and $request.classification.isExternalDomain)
 		| .classification.isDisconnectMatch = (.classification.isDisconnectMatch and $request.classification.isDisconnectMatch)
+		| .classification.isNotDisconnectMatch = (.classification.isNotDisconnectMatch and $request.classification.isNotDisconnectMatch)
 		| .classification.isSuccessful = (.classification.isSuccessful and $request.classification.isSuccessful)
 		| .classification.isUnsuccessful = (.classification.isUnsuccessful and $request.classification.isUnsuccessful)
 		| .classification.isFailed = (.classification.isFailed and $request.classification.isFailed)

@@ -17,6 +17,7 @@ read -d '' getOriginRedirectAggregates <<-'EOF' || true
 	"is-internal-domain": .ratios.isInternalDomain.normalized.cumulative,
 	"is-external-domain": .ratios.isExternalDomain.normalized.cumulative,
 	"is-disconnect-match": .ratios.isDisconnectMatch.normalized.cumulative,
+	"is-not-disconnect-match": .ratios.isNotDisconnectMatch.normalized.cumulative,
 	"is-insecure": .ratios.isInsecure.normalized.cumulative,
 	"is-secure": .ratios.isSecure.normalized.cumulative,
 

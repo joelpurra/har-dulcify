@@ -77,7 +77,8 @@ def mangle:
 	else
 		.
 	end
-	| .classification.isDisconnectMatch = (.blocks and .blocks.disconnect and ((.blocks.disconnect | length) > 0));
+	| .classification.isDisconnectMatch = (.blocks and .blocks.disconnect and ((.blocks.disconnect | length) > 0))
+	| .classification.isNotDisconnectMatch = (.classification.isDisconnectMatch | not);
 
 .origin |= mangle
 | .requestedUrls |= map(mangle)

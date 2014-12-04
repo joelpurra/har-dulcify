@@ -52,6 +52,7 @@ def requestDisconnectCount(prop):
 			isInternalDomain: requestClassificationCount(.isInternalDomain),
 			isExternalDomain: requestClassificationCount(.isExternalDomain),
 			isDisconnectMatch: requestClassificationCount(.isDisconnectMatch),
+			isNotDisconnectMatch: requestClassificationCount(.isNotDisconnectMatch),
 			isSecure: requestClassificationCount(.isSecure),
 			isInsecure: requestClassificationCount(.isInsecure),
 		},
