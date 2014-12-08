@@ -264,7 +264,8 @@ def distinctBase:
 				categories: {},
 			}
 		},
-		count: 0
+		count: 0,
+		countDistinct: 0,
 	};
 
 def distinctMangleDomain(domain):
@@ -324,7 +325,8 @@ def distinctMangleStatus(status):
 def distinctMangle(request):
 	request as $request
 	| if $request.count > 0 then
-		distinctMangleClassification($request)
+		.countDistinct += 1
+		| distinctMangleClassification($request)
 		| ."mime-type" |= distinctMangleMimeType($request."mime-type")
 		| .status |= distinctMangleStatus($request.status)
 		| .url |= distinctMangleUrl($request.url)
@@ -362,7 +364,6 @@ def mangleUrlGroup(requestUrls; originCount):
 			)
 			| .requestedUrlsDistinct |= distinctMangle($requestUrls.requestedUrlsDistinct)
 			| .requestedUrls.countDistinct = .requestedUrls.count
-			| .requestedUrlsDistinct.countDistinct = $originCount
 		else
 			.
 		end
