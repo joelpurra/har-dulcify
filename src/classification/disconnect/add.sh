@@ -76,10 +76,12 @@ def mangle:
 		| deleteNullKey("blocks")
 	else
 		.
-	end;
+	end
+	| .classification.isDisconnectMatch = (.blocks and .blocks.disconnect and ((.blocks.disconnect | length) > 0))
+	| .classification.isNotDisconnectMatch = (.classification.isDisconnectMatch | not);
 
 .origin |= mangle
-| .requestedUrls[] |= mangle
+| .requestedUrls |= map(mangle)
 EOF
 
 cat | jq "$classifyExpandedParts" --argfile "disconnect" "$disconnectClassificationFile"

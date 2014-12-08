@@ -16,13 +16,14 @@ read -d '' getOriginRedirectAggregates <<-'EOF' || true
 	"is-same-primary-domain": .ratios.isSamePrimaryDomain.normalized.cumulative,
 	"is-internal-domain": .ratios.isInternalDomain.normalized.cumulative,
 	"is-external-domain": .ratios.isExternalDomain.normalized.cumulative,
+	"is-disconnect-match": .ratios.isDisconnectMatch.normalized.cumulative,
+	"is-not-disconnect-match": .ratios.isNotDisconnectMatch.normalized.cumulative,
 	"is-insecure": .ratios.isInsecure.normalized.cumulative,
 	"is-secure": .ratios.isSecure.normalized.cumulative,
 
-	"is-disconnect": .ratios.isDisconnect.normalized.cumulative,
-	"disconnect-domains": .occurrences.disonnectDomains.values.values,
-	"disconnect-organizations": .occurrences.disonnectOrganizations.values.values,
-	"disconnect-categories": .occurrences.disonnectCategories.values.values,
+	"disconnect-domains": .occurrences.disonnectDomains.normalized.cumulative,
+	"disconnect-organizations": .occurrences.disonnectOrganizations.normalized.cumulative,
+	"disconnect-categories": .occurrences.disonnectCategories.normalized.cumulative,
 }
 EOF
 
@@ -138,5 +139,5 @@ splitIntoFilesPerBucket() {
 
 "${BASH_SOURCE%/*}/../util/dataset-query.sh" "$@" -- test -e "$ratioBucketsAggregateJson" '&&' cat "$ratioBucketsAggregateJson" '|' jq --arg path '"$PWD"' "'$getOriginRedirectAggregates'" >"datasets.non-failed.ratio-buckets.normalized.cumulative.json"
 
-splitIntoFilesPerBucket "ratio" "is-secure" "is-internal-domain"
+splitIntoFilesPerBucket "ratio" "is-secure" "is-internal-domain" "is-disconnect-match"
 splitIntoFilesPerBucket "occurrences" "disconnect-organizations"

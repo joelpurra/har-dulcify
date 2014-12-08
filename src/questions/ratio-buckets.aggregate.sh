@@ -131,10 +131,10 @@ def ratioBucketsBase:
 		isSamePrimaryDomain: ratioBucket,
 		isInternalDomain: ratioBucket,
 		isExternalDomain: ratioBucket,
+		isDisconnectMatch: ratioBucket,
+		isNotDisconnectMatch: ratioBucket,
 		isSecure: ratioBucket,
 		isInsecure: ratioBucket,
-
-		isDisconnect: ratioBucket,
 	};
 
 def occurrencesBucketsBase:
