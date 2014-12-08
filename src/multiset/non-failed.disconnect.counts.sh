@@ -2,7 +2,7 @@
 set -e
 
 aggregatesAnalysisJson="aggregates.analysis.json"
-disconnectAnalysisFile="../prepared.disconnect.services.analysis.json"
+disconnectAnalysisFile="prepared.disconnect.services.analysis.json"
 
 read -d '' getNonFailedDisconnectCount <<-'EOF' || true
 {
