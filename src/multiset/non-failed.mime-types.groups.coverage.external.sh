@@ -6,7 +6,7 @@ aggregatesAnalysisJson="aggregates.analysis.json"
 read -d '' getNonFailedMimeTypes <<-'EOF' || true
 {
 	path: $path,
-	"non-failed-domains": .successfulOrigin.origin.counts.count,
+	"non-failed-domains-with-external-requests": .successfulOrigin.externalUrls.requestedUrlsDistinct.counts.countDistinct,
 	"kinds-resource-groups": .successfulOrigin.externalUrls.requestedUrlsDistinct.coverage."kinds-resource".groups
 }
 EOF
@@ -14,7 +14,7 @@ EOF
 read -d '' mapData <<-'EOF' || true
 {
 	dataset: (.path | split("/")[-1:][0]),
-	"non-failed-domains",
+	"non-failed-domains-with-external-requests",
 	"html": (."kinds-resource-groups"."html" // 0),
 	"script": (."kinds-resource-groups"."script" // 0),
 	"style": (."kinds-resource-groups"."style" // 0),
@@ -33,7 +33,7 @@ read -d '' renameForTsvColumnOrdering <<-'EOF' || true
 map(
 	{
 		"01--Dataset": .dataset,
-		"02--Domains": ."non-failed-domains",
+		"02--Domains w/ ext": ."non-failed-domains-with-external-requests",
 		"03--html": ."html",
 		"04--script": ."script",
 		"05--style": ."style",

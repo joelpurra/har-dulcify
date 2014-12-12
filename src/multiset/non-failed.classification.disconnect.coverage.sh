@@ -7,14 +7,14 @@ read -d '' getNonFailedClassificationDisconnect <<-'EOF' || true
 {
 	path: $path,
 	"non-failed-domains": .successfulOrigin.origin.counts.count,
+	"non-failed-domains-with-internal-requests": .successfulOrigin.internalUrls.requestedUrlsDistinct.counts.countDistinct,
+	"non-failed-domains-with-external-requests": .successfulOrigin.externalUrls.requestedUrlsDistinct.counts.countDistinct,
 	"all-disconnect-coverage": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-disconnect-match",
 	"all-not-disconnect-coverage": .successfulOrigin.unfilteredUrls.requestedUrlsDistinct.coverage.classification."is-not-disconnect-match",
 	"internal-disconnect-coverage": .successfulOrigin.internalUrls.requestedUrlsDistinct.coverage.classification."is-disconnect-match",
 	"internal-not-disconnect-coverage": .successfulOrigin.internalUrls.requestedUrlsDistinct.coverage.classification."is-not-disconnect-match",
-	"non-failed-domains-with-internal-requests": .successfulOrigin.internalUrls.requestedUrlsDistinct.counts.countDistinct,
 	"external-disconnect-coverage": .successfulOrigin.externalUrls.requestedUrlsDistinct.coverage.classification."is-disconnect-match",
 	"external-not-disconnect-coverage": .successfulOrigin.externalUrls.requestedUrlsDistinct.coverage.classification."is-not-disconnect-match",
-	"non-failed-domains-with-external-requests": .successfulOrigin.externalUrls.requestedUrlsDistinct.counts.countDistinct,
 }
 EOF
 
@@ -22,12 +22,12 @@ read -d '' mapData <<-'EOF' || true
 {
 	dataset: (.path | split("/")[-1:][0]),
 	"non-failed-domains",
+	"non-failed-domains-with-internal-requests",
+	"non-failed-domains-with-external-requests",
 	"all-disconnect-coverage",
 	"all-not-disconnect-coverage",
-	"non-failed-domains-with-internal-requests",
 	"internal-disconnect-coverage",
 	"internal-not-disconnect-coverage",
-	"non-failed-domains-with-external-requests",
 	"external-disconnect-coverage",
 	"external-not-disconnect-coverage",
 	"all-mixed-coverage": (1 - ."all-disconnect-coverage" - ."all-not-disconnect-coverage"),

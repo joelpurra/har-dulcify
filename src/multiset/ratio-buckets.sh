@@ -8,6 +8,7 @@ read -d '' getOriginRedirectAggregates <<-'EOF' || true
 	path: $path,
 	domainCount,
 	nonFailedDomainCount,
+	nonFailedDomainWithRequestCount,
 	requestCount,
 	# Lowercase to allow simple file name generation.
 	"is-same-domain": .ratios.isSameDomain.normalized.cumulative,
@@ -94,7 +95,8 @@ map(
 	| {
 		"001--Dataset": .dataset,
 		# "002--Domains": .nonFailedDomainCount,
-		# "003--Requests": .requestCount,
+		# "003--Domains with requests": .nonFailedDomainWithRequestCount,
+		# "004--Requests": .requestCount,
 	}
 	+ (
 		# 101 buckets because it's [0,100].

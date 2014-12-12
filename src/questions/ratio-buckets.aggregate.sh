@@ -169,6 +169,7 @@ reduce .[] as $item (
 	{
 		domainCount: 0,
 		nonFailedDomainCount: 0,
+		nonFailedDomainWithRequestCount: 0,
 		requestCount: 0,
 		ratios: ratioBucketsBase,
 		occurrences: occurrencesBucketsBase,
@@ -176,7 +177,8 @@ reduce .[] as $item (
 	.domainCount += 1
 	| .nonFailedDomainCount += ($item.isNonFailedDomain | boolToInt)
 	| if ($item.requestCount > 0) then
-		.requestCount += $item.requestCount
+		.nonFailedDomainWithRequestCount += 1
+		|.requestCount += $item.requestCount
 		| .ratios |= deepAddToRatioBuckets($item.counts; $item.requestCount)
 		| .occurrences |= deepMaxBucketIncrement($item.uniqueCounts)
 	else

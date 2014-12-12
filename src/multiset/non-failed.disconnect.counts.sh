@@ -7,7 +7,7 @@ disconnectAnalysisFile="prepared.disconnect.services.analysis.json"
 read -d '' getNonFailedDisconnectCount <<-'EOF' || true
 {
 	path: $path,
-	"non-failed-domains": .successfulOrigin.origin.counts.count,
+	"non-failed-domains-with-external-requests": .successfulOrigin.externalUrls.requestedUrlsDistinct.counts.countDistinct,
 
 	disconnectRequests: (.successfulOrigin.externalUrls.requestedUrls.counts.blocks.disconnect.domains | add),
 
@@ -22,10 +22,10 @@ read -d '' getNonFailedDisconnectCount <<-'EOF' || true
 EOF
 
 read -d '' mapData <<-'EOF' || true
-(.disconnectRequests / ."non-failed-domains") as $disconnectRequestsPerDomain
+(.disconnectRequests / ."non-failed-domains-with-external-requests") as $disconnectRequestsPerDomain
 | {
 	dataset: (.path | split("/")[-1:][0]),
-	"non-failed-domains",
+	"non-failed-domains-with-external-requests",
 
 	disconnectRequests,
 	disconnectDomainCount,
@@ -48,7 +48,7 @@ read -d '' renameForTsvColumnOrdering <<-'EOF' || true
 map(
 	{
 		"01--Dataset": .dataset,
-		"02--Domains": ."non-failed-domains",
+		"02--Domains": ."non-failed-domains-with-external-requests",
 
 		"03--D Requests": .disconnectRequests,
 		"04--D Domains": .disconnectDomainCount,

@@ -6,7 +6,7 @@ aggregatesAnalysisJson="aggregates.analysis.json"
 read -d '' getNonFailedDisconnectCategoryCounts <<-'EOF' || true
 {
 	path: $path,
-	"non-failed-domains": .successfulOrigin.origin.counts.count,
+	"non-failed-domains-with-external-requests": .successfulOrigin.externalUrls.requestedUrlsDistinct.counts.countDistinct,
 	organizations: .successfulOrigin.externalUrls.requestedUrlsDistinct.coverage.blocks.organizations
 }
 EOF
@@ -14,7 +14,7 @@ EOF
 read -d '' mapData <<-'EOF' || true
 {
 	dataset: (.path | split("/")[-1:][0]),
-	"non-failed-domains",
+	"non-failed-domains-with-external-requests",
 	"Google": (.organizations."Google" // 0),
 	"Facebook": (.organizations."Facebook" // 0),
 	"Twitter": (.organizations."Twitter" // 0),
@@ -38,7 +38,7 @@ read -d '' renameForTsvColumnOrdering <<-'EOF' || true
 map(
 	{
 		"01--Dataset": .dataset,
-		"02--Domains": ."non-failed-domains",
+		"02--Domains w/ ext": ."non-failed-domains-with-external-requests",
 		"03--Google": ."Google",
 		"04--Facebook": ."Facebook",
 		"05--Twitter": ."Twitter",

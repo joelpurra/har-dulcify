@@ -58,7 +58,7 @@ map(
 	{
 		"01--Dataset": .dataset,
 		"02--Domains": .nonFailedDomainCount,
-		"03--With R": .domainWithRedirectCount,
+		"03--w/ R": .domainWithRedirectCount,
 		"04--DWR/D": ."domains-with-redirect-ratio",
 		# "xxxxxxx--Redirects": .redirectCount,
 		"05--R/DWR": ."redirects-per-domain",
