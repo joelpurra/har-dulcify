@@ -7,7 +7,8 @@ read -d '' getNonFailedDisconnectCategoryCounts <<-'EOF' || true
 {
 	path: $path,
 	"non-failed-domains-with-external-requests": .successfulOrigin.externalUrls.requestedUrlsDistinct.counts.countDistinct,
-	categories: .successfulOrigin.externalUrls.requestedUrlsDistinct.coverage.blocks.categories
+	"external-not-disconnect-coverage": .successfulOrigin.externalUrls.requestedUrlsDistinct.coverage.classification."is-not-disconnect-match",
+	categories: .successfulOrigin.externalUrls.requestedUrlsDistinct.coverage.blocks.categories,
 }
 EOF
 
@@ -15,6 +16,7 @@ read -d '' mapData <<-'EOF' || true
 {
 	dataset: (.path | split("/")[-1:][0]),
 	"non-failed-domains-with-external-requests",
+	"external-some-coverage": (1 - ."external-not-disconnect-coverage"),
 	"Disconnect": (.categories.Disconnect // 0),
 	"Content": (.categories.Content // 0),
 	"Advertising": (.categories.Advertising // 0),
@@ -28,11 +30,12 @@ map(
 	{
 		"01--Dataset": .dataset,
 		"02--Domains": ."non-failed-domains-with-external-requests",
-		"03--Disconnect": .Disconnect,
-		"04--Content": .Content,
-		"05--Advertising": .Advertising,
-		"06--Analytics": .Analytics,
-		"07--Social": .Social
+		"03--Any": ."external-some-coverage",
+		"04--Disconnect": .Disconnect,
+		"05--Content": .Content,
+		"06--Advertising": .Advertising,
+		"07--Analytics": .Analytics,
+		"08--Social": .Social
 	}
 )
 EOF
