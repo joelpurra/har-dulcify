@@ -15,6 +15,8 @@ set -e
 <"domains.parts.expanded.public-suffix.classified.disconnect.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../questions/ratio-buckets.sh" > "ratio-buckets.json"
 # TODO: parallelize question aggregation?
 <"ratio-buckets.json" "${BASH_SOURCE%/*}/../questions/ratio-buckets.aggregate.sh" > "ratio-buckets.aggregate.json"
+# TODO: parallelize question analysis?
+<"ratio-buckets.aggregate.json" "${BASH_SOURCE%/*}/../questions/ratio-buckets.aggregate.analysis.sh" > "ratio-buckets.aggregate.analysis.json"
 
 # Regroup disconnect's categories and organizations
 <"aggregates.analysis.json" "${BASH_SOURCE%/*}/../questions/disconnect.categories.organizations.sh" "prepared.disconnect.services.json" > "aggregate.disconnect.categories.organizations.json"
