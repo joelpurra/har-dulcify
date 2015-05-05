@@ -36,7 +36,7 @@ getMergedObjectCount() {
 }
 
 
-cat | "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/prepare2.sh" > "$TEMPOUT1"
+cat > "$TEMPOUT1"
 
 getMergedObjectCount
 

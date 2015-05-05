@@ -20,3 +20,7 @@ set -e
 
 # Regroup disconnect's categories and organizations
 <"aggregates.analysis.json" "${BASH_SOURCE%/*}/../questions/disconnect.categories.organizations.sh" "prepared.disconnect.services.json" > "aggregate.disconnect.categories.organizations.json"
+
+# Top domains in Alexa.
+<"aggregates.base.json" "${BASH_SOURCE%/*}/../util/parallel-chunks.sh" "${BASH_SOURCE%/*}/../questions/alexa-rank.sh" > "alexa-rank.json"
+"${BASH_SOURCE%/*}/../questions/alexa-rank.tsv.sh"

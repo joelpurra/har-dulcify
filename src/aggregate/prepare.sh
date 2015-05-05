@@ -116,9 +116,14 @@ def mangle:
 		blocks: {
 			disconnect: .blocks.disconnect
 		}
-		| deleteNullKey("disconnect")
+		| deleteNullKey("disconnect"),
+		rank: {
+			alexa: .rank.alexa
+		}
+		| deleteNullKey("alexa")
 	}
-	| deleteNullKey("blocks");
+	| deleteNullKey("blocks")
+	| deleteNullKey("rank");
 
 def distinctMangleDomain(domain):
 	domain as $domain
@@ -209,6 +214,7 @@ def distinctMangle:
 		| .status |= distinctMangleStatus($request.status)
 		| .url |= distinctMangleUrl($request.url)
 		| distinctMangleBlocks($request)
+		# TODO: .rank.alexa
 		| .count += 1
 	)
 	| .blocks.disconnect |= (

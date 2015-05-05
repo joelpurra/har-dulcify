@@ -160,6 +160,12 @@ def base:
 				categories: {},
 			}
 		},
+		rank: {
+			alexa: {
+				# TODO: add ore stats for all/highest/lowest.
+				"primary-domain": 0,
+			}
+		},
 		count: 0
 	};
 
@@ -203,6 +209,22 @@ def mangleBlocks(request):
 	request as $request
 	| .blocks.disconnect |= mangleDisconnect($request.blocks.disconnect);
 
+def mangleAlexa(alexa):
+	alexa as $alexa
+	| if $alexa then
+		if $alexa."primary-domain" > 0 then
+			."primary-domain" += 1
+		else
+			.
+		end
+	 else
+		.
+	end;
+
+def mangleRanks(request):
+	request as $request
+	| .rank.alexa |= mangleAlexa($request.rank.alexa);
+
 def mangleMimeType(mimeType):
 	mimeType as $mimeType
 	| .types |= addToKeyCounterObject($mimeType.type | fallbackString)
@@ -220,6 +242,7 @@ def mangle(request):
 	| .status |= mangleStatus($request.status)
 	| .url |= mangleUrl($request.url | fallbackString)
 	| mangleBlocks($request)
+	| mangleRanks($request)
 	| .count += 1;
 
 def distinctBaseUrl:
@@ -330,6 +353,7 @@ def distinctMangle(request):
 		| ."mime-type" |= distinctMangleMimeType($request."mime-type")
 		| .status |= distinctMangleStatus($request.status)
 		| .url |= distinctMangleUrl($request.url)
+		# TODO: .rank.alexa
 		| distinctMangleBlocks($request)
 	else
 		.
