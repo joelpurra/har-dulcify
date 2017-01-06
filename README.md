@@ -117,9 +117,9 @@ If you use, like, reference, or base work on the thesis report [*Swedes Online: 
 
 ## Original purpose
 
-Built as a component in [Joel Purra's master's thesis](http://joelpurra.com/projects/masters-thesis/) research, where downloading lots of front pages in the .se top level domain zone was required to analyze their content and use of internal/external resources.
+Built as a component in [Joel Purra's master's thesis](https://joelpurra.com/projects/masters-thesis/) research, where downloading lots of front pages in the .se top level domain zone was required to analyze their content and use of internal/external resources.
 
 
 ---
 
-Copyright (c) 2014, 2015, 2016, 2017 [Joel Purra](http://joelpurra.com/). Released under [GNU General Public License version 3.0 (GPL-3.0)](https://www.gnu.org/licenses/gpl.html).
+Copyright (c) 2014, 2015, 2016, 2017 [Joel Purra](https://joelpurra.com/). Released under [GNU General Public License version 3.0 (GPL-3.0)](https://www.gnu.org/licenses/gpl.html).
