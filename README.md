@@ -100,6 +100,13 @@ $ tree src/
 
 
 
+# Original purpose
+
+[![Photo of Joel Purra presenting his master's thesis, named Swedes Online: You Are More Tracked Than You Think](https://files.joelpurra.com/projects/masters-thesis/video/2015-02-19/joel-purra_masters-thesis_2015-02-19_defense_highres.jpg)](https://joelpurra.com/projects/masters-thesis/)
+
+Built as a component in [Joel Purra's master's thesis](https://joelpurra.com/projects/masters-thesis/) research, where downloading lots of front pages in the .se top level domain zone was required to analyze their content and use of internal/external resources.
+
+
 ## Citations
 
 If you use, like, reference, or base work on the thesis report [*Swedes Online: You Are More Tracked Than You Think*](https://joelpurra.com/projects/masters-thesis/#thesis), the IEEE LCN 2016 paper [*Third-party Tracking on the Web: A Swedish Perspective*](https://joelpurra.com/projects/masters-thesis/#ieee-lcn-2016), open [source code](https://joelpurra.com/projects/masters-thesis/#open-source), or [open data](https://joelpurra.com/projects/masters-thesis/#open-data), please add at least on of the following two citations with a link to the project website: https://joelpurra.com/projects/masters-thesis/
@@ -113,11 +120,6 @@ If you use, like, reference, or base work on the thesis report [*Swedes Online: 
 
 > J. Purra, N. Carlsson, Third-party Tracking on the Web: A Swedish Perspective, Proc. IEEE Conference on Local Computer Networks (LCN), Dubai, UAE, Nov. 2016. https://joelpurra.com/projects/masters-thesis/
 
-
-
-## Original purpose
-
-Built as a component in [Joel Purra's master's thesis](https://joelpurra.com/projects/masters-thesis/) research, where downloading lots of front pages in the .se top level domain zone was required to analyze their content and use of internal/external resources.
 
 
 ---
