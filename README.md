@@ -4,6 +4,12 @@ Extract data from [HTTP Archive (HAR) files](http://www.softwareishard.com/blog/
 
 
 
+> ## ⚠️ This project has been archived
+>
+> No future updates are planned. Feel free to continue using it, but expect no support.
+
+
+
 ## Usage
 
 ```bash
